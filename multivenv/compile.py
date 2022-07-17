@@ -9,4 +9,9 @@ def compile_venv_requirements(config: VenvConfig):
 
 
 def pip_tools_compile(requirements_in: Path, requirements_out: Path) -> CLIResult:
-    return run(f"pip-compile {requirements_in} -o {requirements_out}")
+    env = {"CUSTOM_COMPILE_COMMAND": "mvenv compile"}
+    return run(
+        f"pip-compile {requirements_in} -o {requirements_out}",
+        env=env,
+        extend_existing_env=True,
+    )

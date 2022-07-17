@@ -17,7 +17,7 @@ cliconf_settings = cliconf.CLIConfSettings(recursive_loading=True)
 
 COMMAND_ARG = typer.Argument(..., help="Command to run")
 VENV_NAMES_ARG = typer.Argument(
-    [],
+    ...,
     help="Names of the virtual environments to work on. Defaults to all",
     show_default=False,
 )
@@ -52,6 +52,8 @@ def sync(
         sync_venv(venv_config)
 
 
+@cli.command()
+@cliconf.configure(conf_settings, cliconf_settings)
 def compile(
     venv_names: List[str] = VENV_NAMES_ARG,
     venvs: Optional[List[VenvUserConfig]] = None,
@@ -76,6 +78,8 @@ def update():
     pass
 
 
+@cli.command()
+@cliconf.configure(conf_settings, cliconf_settings)
 def run(
     venv_name: str = typer.Argument(
         ..., help="Name of the virtual environment to run command in"
@@ -96,6 +100,8 @@ def run(
     run_in_venv(venv_config, command)
 
 
+@cli.command()
+@cliconf.configure(conf_settings, cliconf_settings)
 def run_all(
     command: str = COMMAND_ARG,
     venvs: Optional[List[VenvUserConfig]] = None,

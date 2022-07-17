@@ -1,6 +1,7 @@
+import os
 import shlex
 import subprocess
-from typing import NamedTuple
+from typing import Mapping, NamedTuple, Optional
 
 from pydantic import BaseModel
 
@@ -10,8 +11,21 @@ class CLIResult(BaseModel):
     stderr: str
 
 
-def run(command: str) -> CLIResult:
-    result = subprocess.run(shlex.split(command), capture_output=True, check=True)
+def run(
+    command: str,
+    env: Optional[Mapping[str, str]] = None,
+    extend_existing_env: bool = False,
+) -> CLIResult:
+    use_env = env
+    if env is not None:
+        if extend_existing_env:
+            use_env = os.environ.copy()
+            use_env.update(env)
+        else:
+            use_env = env
+    result = subprocess.run(
+        command, capture_output=True, check=True, env=use_env, shell=True
+    )
     return CLIResult(stdout=result.stdout.decode(), stderr=result.stderr.decode())
 
 
