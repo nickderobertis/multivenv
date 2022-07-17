@@ -1,0 +1,5 @@
+[tool.black]
+include = 'multivenv.*\.pyi?$|tests.*\.pyi?$'
+
+[tool.isort]
+profile = "black"

@@ -14,7 +14,26 @@
   "applied_templates": [
     {
       "name": "copier-pypi-sphinx-flexlate",
-      "data": {},
+      "data": {
+        "package_name": "multivenv",
+        "package_directory": "multivenv",
+        "full_name": "multivenv",
+        "repo_name": "multivenv",
+        "repo_username": "nickderobertis",
+        "short_description": "Python Virtualenv manager supporting multiple venvs and platforms in one project",
+        "main_branch_name": "main",
+        "package_author": "Nick DeRobertis",
+        "author_email": "derobertis.nick@gmail.com",
+        "google_analytics_id": "",
+        "os_support": [
+          "ubuntu",
+          "macos",
+          "windows"
+        ],
+        "minimum_python_version": "3.8",
+        "logo_url": "",
+        "install_packages": ""
+      },
       "version": "d204496059f1759fea5a9e5da07491c84ec0f2f3",
       "add_mode": "local",
       "root": "."
