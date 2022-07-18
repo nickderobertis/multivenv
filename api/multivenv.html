@@ -47,7 +47,7 @@
   
   
   
-    <title>multivenv package &#8212; multivenv 1.0.0a2 documentation</title>
+    <title>multivenv package &#8212; multivenv 1.0.0a3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
@@ -90,7 +90,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../index.html" title="multivenv 1.0.0a2 documentation"
+        <a href="../index.html" title="multivenv 1.0.0a3 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe869</i>
@@ -176,7 +176,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">multivenv 1.0.0a2 documentation</a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">multivenv 1.0.0a3 documentation</a></li>
           <li class="md-tabs__item"><a href="modules.html" class="md-tabs__link">multivenv</a></li>
       </ul>
     </div>
@@ -189,13 +189,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../index.html" title="multivenv 1.0.0a2 documentation" class="md-nav__button md-logo">
+    <a href="../index.html" title="multivenv 1.0.0a3 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe869</i>
       
     </a>
     <a href="../index.html"
-       title="multivenv 1.0.0a2 documentation">multivenv</a>
+       title="multivenv 1.0.0a3 documentation">multivenv</a>
   </label>
     <div class="md-nav__source">
       <a href="https://github.com/nickderobertis/multivenv" title="Go to repository" class="md-source" data-md-source="github">
@@ -259,6 +259,8 @@
         </li>
         <li class="md-nav__item"><a href="#module-multivenv.create" class="md-nav__link">multivenv.create module</a>
         </li>
+        <li class="md-nav__item"><a href="#module-multivenv.exc" class="md-nav__link">multivenv.exc module</a>
+        </li>
         <li class="md-nav__item"><a href="#module-multivenv.ext_subprocess" class="md-nav__link">multivenv.ext_subprocess module</a>
         </li>
         <li class="md-nav__item"><a href="#module-multivenv.run" class="md-nav__link">multivenv.run module</a>
@@ -305,6 +307,13 @@
     
     
       <a href="#module-multivenv.create" class="md-nav__link">multivenv.create module</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#module-multivenv.exc" class="md-nav__link">multivenv.exc module</a>
       
     
     </li>
@@ -358,6 +367,8 @@
         <li class="md-nav__item"><a href="#module-multivenv.config" class="md-nav__link">multivenv.config module</a>
         </li>
         <li class="md-nav__item"><a href="#module-multivenv.create" class="md-nav__link">multivenv.create module</a>
+        </li>
+        <li class="md-nav__item"><a href="#module-multivenv.exc" class="md-nav__link">multivenv.exc module</a>
         </li>
         <li class="md-nav__item"><a href="#module-multivenv.ext_subprocess" class="md-nav__link">multivenv.ext_subprocess module</a>
         </li>
@@ -418,7 +429,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="multivenv.config.VenvConfig.from_user_config">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_user_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multivenv/config.html#VenvConfig.from_user_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.config.VenvConfig.from_user_config" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_user_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multivenv/config.html#VenvConfig.from_user_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.config.VenvConfig.from_user_config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="multivenv.config.VenvConfig.name">
@@ -442,10 +453,6 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.config.</span></span><span class="sig-name descname"><span class="pre">VenvUserConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multivenv/config.html#VenvUserConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.config.VenvUserConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="multivenv.config.VenvUserConfig.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#multivenv.config.VenvUserConfig.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
 <dt class="sig sig-object py" id="multivenv.config.VenvUserConfig.requirements_in">
 <span class="sig-name descname"><span class="pre">requirements_in</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#multivenv.config.VenvUserConfig.requirements_in" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -465,6 +472,29 @@
 <dt class="sig sig-object py" id="multivenv.create.create_venv_if_not_exists">
 <span class="sig-prename descclassname"><span class="pre">multivenv.create.</span></span><span class="sig-name descname"><span class="pre">create_venv_if_not_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multivenv/create.html#create_venv_if_not_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.create.create_venv_if_not_exists" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+</section>
+<section id="module-multivenv.exc">
+<span id="multivenv-exc-module"></span><h2 id="module-multivenv.exc">multivenv.exc module<a class="headerlink" href="#module-multivenv.exc" title="Permalink to this heading">¶</a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="multivenv.exc.MultivenvConfigException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.exc.</span></span><span class="sig-name descname"><span class="pre">MultivenvConfigException</span></span><a class="reference internal" href="../_modules/multivenv/exc.html#MultivenvConfigException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.MultivenvConfigException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#multivenv.exc.MultivenvException" title="multivenv.exc.MultivenvException"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultivenvException</span></code></a></p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="multivenv.exc.MultivenvException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.exc.</span></span><span class="sig-name descname"><span class="pre">MultivenvException</span></span><a class="reference internal" href="../_modules/multivenv/exc.html#MultivenvException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.MultivenvException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="multivenv.exc.MutlivenvConfigVenvsNotDefinedException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.exc.</span></span><span class="sig-name descname"><span class="pre">MutlivenvConfigVenvsNotDefinedException</span></span><a class="reference internal" href="../_modules/multivenv/exc.html#MutlivenvConfigVenvsNotDefinedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.MutlivenvConfigVenvsNotDefinedException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#multivenv.exc.MultivenvConfigException" title="multivenv.exc.MultivenvConfigException"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultivenvConfigException</span></code></a></p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="multivenv.exc.NoSuchVenvException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.exc.</span></span><span class="sig-name descname"><span class="pre">NoSuchVenvException</span></span><a class="reference internal" href="../_modules/multivenv/exc.html#NoSuchVenvException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.NoSuchVenvException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#multivenv.exc.MultivenvConfigException" title="multivenv.exc.MultivenvConfigException"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultivenvConfigException</span></code></a></p>
+</dd></dl>
 </section>
 <section id="module-multivenv.ext_subprocess">
 <span id="multivenv-ext-subprocess-module"></span><h2 id="module-multivenv.ext_subprocess">multivenv.ext_subprocess module<a class="headerlink" href="#module-multivenv.ext_subprocess" title="Permalink to this heading">¶</a></h2>

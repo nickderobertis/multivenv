@@ -46,7 +46,7 @@
   
   
   
-    <title>multivenv.config &#8212; multivenv 1.0.0a2 documentation</title>
+    <title>multivenv.config &#8212; multivenv 1.0.0a3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -88,7 +88,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../../index.html" title="multivenv 1.0.0a2 documentation"
+        <a href="../../index.html" title="multivenv 1.0.0a3 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe869</i>
@@ -174,7 +174,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a2 documentation</a></li>
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a3 documentation</a></li>
           <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Module code</a></li>
       </ul>
     </div>
@@ -187,13 +187,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../../index.html" title="multivenv 1.0.0a2 documentation" class="md-nav__button md-logo">
+    <a href="../../index.html" title="multivenv 1.0.0a3 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe869</i>
       
     </a>
     <a href="../../index.html"
-       title="multivenv 1.0.0a2 documentation">multivenv</a>
+       title="multivenv 1.0.0a3 documentation">multivenv</a>
   </label>
     <div class="md-nav__source">
       <a href="https://github.com/nickderobertis/multivenv" title="Go to repository" class="md-source" data-md-source="github">
@@ -269,7 +269,6 @@
 
 
 <div class="viewcode-block" id="VenvUserConfig"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.config.VenvUserConfig">[docs]</a><span class="k">class</span> <span class="nc">VenvUserConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">requirements_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">requirements_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
@@ -281,15 +280,16 @@
     <span class="n">requirements_out</span><span class="p">:</span> <span class="n">Path</span>
 
 <div class="viewcode-block" id="VenvConfig.from_user_config"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.config.VenvConfig.from_user_config">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_user_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">VenvUserConfig</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
-        <span class="n">requirements_in</span> <span class="o">=</span> <span class="n">_get_requirements_in_path</span><span class="p">(</span>
-            <span class="n">user_config</span><span class="o">.</span><span class="n">requirements_in</span><span class="p">,</span> <span class="n">user_config</span><span class="o">.</span><span class="n">name</span>
-        <span class="p">)</span>
-        <span class="n">requirements_out</span> <span class="o">=</span> <span class="n">user_config</span><span class="o">.</span><span class="n">requirements_out</span> <span class="ow">or</span> <span class="n">requirements_in</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span>
-            <span class="s2">".txt"</span>
-        <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">from_user_config</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VenvUserConfig</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="p">):</span>
+        <span class="n">user_requirements_in</span> <span class="o">=</span> <span class="n">user_config</span><span class="o">.</span><span class="n">requirements_in</span> <span class="k">if</span> <span class="n">user_config</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">user_requirements_out</span> <span class="o">=</span> <span class="n">user_config</span><span class="o">.</span><span class="n">requirements_out</span> <span class="k">if</span> <span class="n">user_config</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="n">requirements_in</span> <span class="o">=</span> <span class="n">_get_requirements_in_path</span><span class="p">(</span><span class="n">user_requirements_in</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">requirements_out</span> <span class="o">=</span> <span class="n">user_requirements_out</span> <span class="ow">or</span> <span class="n">requirements_in</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".txt"</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">user_config</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
             <span class="n">requirements_in</span><span class="o">=</span><span class="n">requirements_in</span><span class="p">,</span>
             <span class="n">requirements_out</span><span class="o">=</span><span class="n">requirements_out</span><span class="p">,</span>

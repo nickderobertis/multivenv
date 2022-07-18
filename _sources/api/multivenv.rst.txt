@@ -41,6 +41,14 @@ multivenv.create module
    :undoc-members:
    :show-inheritance:
 
+multivenv.exc module
+--------------------
+
+.. automodule:: multivenv.exc
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 multivenv.ext\_subprocess module
 --------------------------------
 

@@ -46,7 +46,7 @@
   
   
   
-    <title>multivenv.cli &#8212; multivenv 1.0.0a2 documentation</title>
+    <title>multivenv.cli &#8212; multivenv 1.0.0a3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -88,7 +88,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../../index.html" title="multivenv 1.0.0a2 documentation"
+        <a href="../../index.html" title="multivenv 1.0.0a3 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe869</i>
@@ -174,7 +174,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a2 documentation</a></li>
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a3 documentation</a></li>
           <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Module code</a></li>
       </ul>
     </div>
@@ -187,13 +187,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../../index.html" title="multivenv 1.0.0a2 documentation" class="md-nav__button md-logo">
+    <a href="../../index.html" title="multivenv 1.0.0a3 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe869</i>
       
     </a>
     <a href="../../index.html"
-       title="multivenv 1.0.0a2 documentation">multivenv</a>
+       title="multivenv 1.0.0a3 documentation">multivenv</a>
   </label>
     <div class="md-nav__source">
       <a href="https://github.com/nickderobertis/multivenv" title="Go to repository" class="md-source" data-md-source="github">
@@ -263,13 +263,14 @@
             
   <h1 id="modules-multivenv-cli--page-root">Source code for multivenv.cli</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">cliconf</span>
 <span class="kn">import</span> <span class="nn">typer</span>
 
 <span class="kn">from</span> <span class="nn">multivenv.compile</span> <span class="kn">import</span> <span class="n">compile_venv_requirements</span>
 <span class="kn">from</span> <span class="nn">multivenv.config</span> <span class="kn">import</span> <span class="n">VenvConfig</span><span class="p">,</span> <span class="n">VenvUserConfig</span>
+<span class="kn">from</span> <span class="nn">multivenv.exc</span> <span class="kn">import</span> <span class="n">MutlivenvConfigVenvsNotDefinedException</span><span class="p">,</span> <span class="n">NoSuchVenvException</span>
 <span class="kn">from</span> <span class="nn">multivenv.run</span> <span class="kn">import</span> <span class="n">run_in_venv</span>
 <span class="kn">from</span> <span class="nn">multivenv.sync</span> <span class="kn">import</span> <span class="n">sync_venv</span>
 
@@ -294,24 +295,17 @@
     <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="n">Venvs</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VenvUserConfig</span><span class="p">]]</span>
+
 
 <span class="nd">@cli</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
 <span class="nd">@cliconf</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">conf_settings</span><span class="p">,</span> <span class="n">cliconf_settings</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span>
     <span class="n">venv_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">VENV_NAMES_ARG</span><span class="p">,</span>
-    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">VenvUserConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Venvs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">venv_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">VENV_FOLDER_OPTION</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">venvs</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"Must have venvs defined in the config. Pass --config-gen to set up a new config"</span>
-        <span class="p">)</span>
-    <span class="n">venv_names</span> <span class="o">=</span> <span class="n">venv_names</span> <span class="ow">or</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">venvs</span><span class="p">]</span>
-    <span class="n">venv_configs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">VenvConfig</span><span class="o">.</span><span class="n">from_user_config</span><span class="p">(</span><span class="n">venv_config</span><span class="p">,</span> <span class="n">venv_folder</span> <span class="o">/</span> <span class="n">venv_config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">venv_config</span> <span class="ow">in</span> <span class="n">venvs</span>
-        <span class="k">if</span> <span class="n">venv_config</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">venv_names</span>
-    <span class="p">]</span>
+    <span class="n">venv_configs</span> <span class="o">=</span> <span class="n">_create_internal_venv_configs</span><span class="p">(</span><span class="n">venvs</span><span class="p">,</span> <span class="n">venv_names</span><span class="p">,</span> <span class="n">venv_folder</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">venv_config</span> <span class="ow">in</span> <span class="n">venv_configs</span><span class="p">:</span>
         <span class="n">sync_venv</span><span class="p">(</span><span class="n">venv_config</span><span class="p">)</span>
 
@@ -320,19 +314,10 @@
 <span class="nd">@cliconf</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">conf_settings</span><span class="p">,</span> <span class="n">cliconf_settings</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span>
     <span class="n">venv_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">VENV_NAMES_ARG</span><span class="p">,</span>
-    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">VenvUserConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Venvs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">venv_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">VENV_FOLDER_OPTION</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">venvs</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"Must have venvs defined in the config. Pass --config-gen to set up a new config"</span>
-        <span class="p">)</span>
-    <span class="n">venv_names</span> <span class="o">=</span> <span class="n">venv_names</span> <span class="ow">or</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">venvs</span><span class="p">]</span>
-    <span class="n">venv_configs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">VenvConfig</span><span class="o">.</span><span class="n">from_user_config</span><span class="p">(</span><span class="n">venv_config</span><span class="p">,</span> <span class="n">venv_folder</span> <span class="o">/</span> <span class="n">venv_config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">venv_config</span> <span class="ow">in</span> <span class="n">venvs</span>
-        <span class="k">if</span> <span class="n">venv_config</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">venv_names</span>
-    <span class="p">]</span>
+    <span class="n">venv_configs</span> <span class="o">=</span> <span class="n">_create_internal_venv_configs</span><span class="p">(</span><span class="n">venvs</span><span class="p">,</span> <span class="n">venv_names</span><span class="p">,</span> <span class="n">venv_folder</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">venv_config</span> <span class="ow">in</span> <span class="n">venv_configs</span><span class="p">:</span>
         <span class="n">compile_venv_requirements</span><span class="p">(</span><span class="n">venv_config</span><span class="p">)</span>
 
@@ -349,19 +334,15 @@
         <span class="o">...</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">"Name of the virtual environment to run command in"</span>
     <span class="p">),</span>
     <span class="n">command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">COMMAND_ARG</span><span class="p">,</span>
-    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">VenvUserConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Venvs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">venv_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">VENV_FOLDER_OPTION</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">venvs</span><span class="p">:</span>
-        <span class="c1"># TODO: restructure and create specific error for no venvs/config</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"Must have venvs defined in the config. Pass --config-gen to set up a new config"</span>
-        <span class="p">)</span>
-    <span class="c1"># TODO: check for correct venv name</span>
-    <span class="n">venv_user_config</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">venvs</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">venv_name</span><span class="p">)</span>
-    <span class="n">venv_config</span> <span class="o">=</span> <span class="n">VenvConfig</span><span class="o">.</span><span class="n">from_user_config</span><span class="p">(</span>
-        <span class="n">venv_user_config</span><span class="p">,</span> <span class="n">venv_folder</span> <span class="o">/</span> <span class="n">venv_user_config</span><span class="o">.</span><span class="n">name</span>
-    <span class="p">)</span>
+    <span class="n">venv_configs</span> <span class="o">=</span> <span class="n">_create_internal_venv_configs</span><span class="p">(</span><span class="n">venvs</span><span class="p">,</span> <span class="p">[</span><span class="n">venv_name</span><span class="p">],</span> <span class="n">venv_folder</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">venv_configs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NoSuchVenvException</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not find </span><span class="si">{</span><span class="n">venv_name</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">venvs</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">venv_configs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">venv_config</span> <span class="o">=</span> <span class="n">venv_configs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
     <span class="n">full_command</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
     <span class="c1"># TODO: better CLI output</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">run_in_venv</span><span class="p">(</span><span class="n">venv_config</span><span class="p">,</span> <span class="n">full_command</span><span class="p">))</span>
@@ -371,21 +352,34 @@
 <span class="nd">@cliconf</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">conf_settings</span><span class="p">,</span> <span class="n">cliconf_settings</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">run_all</span><span class="p">(</span>
     <span class="n">command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">COMMAND_ARG</span><span class="p">,</span>
-    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">VenvUserConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Venvs</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">venv_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">VENV_FOLDER_OPTION</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">venvs</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">"Must have venvs defined in the config. Pass --config-gen to set up a new config"</span>
         <span class="p">)</span>
-    <span class="n">venv_configs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">VenvConfig</span><span class="o">.</span><span class="n">from_user_config</span><span class="p">(</span><span class="n">venv_config</span><span class="p">,</span> <span class="n">venv_folder</span> <span class="o">/</span> <span class="n">venv_config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">venv_config</span> <span class="ow">in</span> <span class="n">venvs</span>
-    <span class="p">]</span>
+    <span class="n">venv_configs</span> <span class="o">=</span> <span class="n">_create_internal_venv_configs</span><span class="p">(</span><span class="n">venvs</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">venv_folder</span><span class="p">)</span>
     <span class="n">full_command</span> <span class="o">=</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">venv_config</span> <span class="ow">in</span> <span class="n">venv_configs</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Running in </span><span class="si">{</span><span class="n">venv_config</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">run_in_venv</span><span class="p">(</span><span class="n">venv_config</span><span class="p">,</span> <span class="n">full_command</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_create_internal_venv_configs</span><span class="p">(</span>
+    <span class="n">venvs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Venvs</span><span class="p">],</span> <span class="n">venv_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">venv_folder</span><span class="p">:</span> <span class="n">Path</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">venvs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MutlivenvConfigVenvsNotDefinedException</span><span class="p">(</span>
+            <span class="s2">"Must have venvs defined in the config. Pass --config-gen to set up a new config"</span>
+        <span class="p">)</span>
+    <span class="n">venv_names</span> <span class="o">=</span> <span class="n">venv_names</span> <span class="ow">or</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">venvs</span><span class="p">]</span>
+    <span class="n">venv_configs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">VenvConfig</span><span class="o">.</span><span class="n">from_user_config</span><span class="p">(</span><span class="n">venv_config</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">venv_folder</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">venv_config</span> <span class="ow">in</span> <span class="n">venvs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">venv_names</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">venv_configs</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
