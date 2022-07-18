@@ -4,7 +4,11 @@ from pathlib import Path
 import pytest
 
 from multivenv.config import VenvConfig, VenvUserConfig
-from tests.config import REQUIREMENTS_IN_PATH, REQUIREMENTS_OUT_PATH
+from tests.config import (
+    REQUIREMENTS_IN_PATH,
+    REQUIREMENTS_MULTIPLATFORM_OUT_PATH,
+    REQUIREMENTS_OUT_PATH,
+)
 from tests.fixtures.temp_dir import temp_dir
 
 
@@ -38,3 +42,15 @@ def multiplatform_venv_config(temp_dir: Path) -> VenvConfig:
         global_platforms=["linux_x86_64", "win32"],
         global_versions=["3.7", "3.10"],
     )
+
+
+@pytest.fixture
+def compiled_multiplatform_venv_config(
+    multiplatform_venv_config: VenvConfig,
+) -> VenvConfig:
+    venv_config = multiplatform_venv_config
+
+    shutil.copy(
+        REQUIREMENTS_MULTIPLATFORM_OUT_PATH, venv_config.requirements_out.parent
+    )
+    yield venv_config

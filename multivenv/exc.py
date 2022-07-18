@@ -12,3 +12,11 @@ class MutlivenvConfigVenvsNotDefinedException(MultivenvConfigException):
 
 class NoSuchVenvException(MultivenvConfigException):
     pass
+
+
+class RequirementsFileException(MultivenvException):
+    pass
+
+
+class CompiledRequirementsNotFoundException(RequirementsFileException):
+    pass
