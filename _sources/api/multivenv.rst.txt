@@ -65,6 +65,14 @@ multivenv.run module
    :undoc-members:
    :show-inheritance:
 
+multivenv.styles module
+-----------------------
+
+.. automodule:: multivenv.styles
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 multivenv.sync module
 ---------------------
 
