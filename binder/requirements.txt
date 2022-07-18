@@ -1,4 +1,4 @@
 multivenv
-cliconf
 virtualenv
 pip-tools
+cliconf

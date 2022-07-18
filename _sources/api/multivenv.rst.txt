@@ -57,6 +57,14 @@ multivenv.ext\_subprocess module
    :undoc-members:
    :show-inheritance:
 
+multivenv.info module
+---------------------
+
+.. automodule:: multivenv.info
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 multivenv.run module
 --------------------
 
@@ -77,6 +85,14 @@ multivenv.sync module
 ---------------------
 
 .. automodule:: multivenv.sync
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+multivenv.types module
+----------------------
+
+.. automodule:: multivenv.types
    :members:
    :undoc-members:
    :show-inheritance:
