@@ -20,7 +20,9 @@ REPO_MAINTAINERS = [
 ]
 
 # Short description of the package
-PACKAGE_SHORT_DESCRIPTION = "Python Virtualenv manager supporting multiple venvs and platforms in one project"
+PACKAGE_SHORT_DESCRIPTION = (
+    "Python Virtualenv manager supporting multiple venvs and platforms in one project"
+)
 
 # Long description of the package for PyPI
 # Set to 'auto' to use README.md as the PyPI description
@@ -57,6 +59,9 @@ PACKAGE_INSTALL_REQUIRES = [
     # e.g.
     # 'package',
     # 'otherpackage>=1,<2'
+    "virtualenv",
+    "pip-tools",
+    "cliconf",
 ]
 
 # Add any third party packages you use in requirements for optional features of your package here
