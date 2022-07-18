@@ -207,8 +207,10 @@ def test_info_json(temp_dir: Path):
         assert info["name"] == "basic"
         assert "venvs" in info["path"]
         assert "requirements.txt" in output.stdout
-        assert info["requirements_in"] == "requirements.in"
-        assert info["requirements_out"] == "requirements.txt"
+        assert info["config_requirements"]["in_path"] == "requirements.in"
+        assert info["config_requirements"]["out_path"] == "requirements.txt"
+        assert info["discovered_requirements"]["in_path"] == "requirements.in"
+        assert info["discovered_requirements"]["out_path"] == None
         assert info["exists"] is False
 
 
