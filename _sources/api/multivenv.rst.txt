@@ -1,0 +1,67 @@
+multivenv package
+=================
+
+.. automodule:: multivenv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+multivenv.cli module
+--------------------
+
+.. automodule:: multivenv.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+multivenv.compile module
+------------------------
+
+.. automodule:: multivenv.compile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+multivenv.config module
+-----------------------
+
+.. automodule:: multivenv.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+multivenv.create module
+-----------------------
+
+.. automodule:: multivenv.create
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+multivenv.ext\_subprocess module
+--------------------------------
+
+.. automodule:: multivenv.ext_subprocess
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+multivenv.run module
+--------------------
+
+.. automodule:: multivenv.run
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+multivenv.sync module
+---------------------
+
+.. automodule:: multivenv.sync
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
