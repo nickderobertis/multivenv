@@ -51,6 +51,8 @@ def test_sync_cli(temp_dir: Path):
             path=venv_folder,
             requirements_in=temp_dir / "requirements.in",
             requirements_out=temp_dir / "requirements.txt",
+            versions=[],
+            platforms=[],
         )
         run_cli("sync")
         assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)

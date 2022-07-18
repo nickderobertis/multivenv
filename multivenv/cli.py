@@ -58,8 +58,24 @@ def compile(
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
+    versions: Optional[List[str]] = typer.Option(
+        None,
+        "-v",
+        "--version",
+        help="Python versions to compile for. Defaults to the current python version",
+        show_default=False,
+    ),
+    platforms: Optional[List[str]] = typer.Option(
+        None,
+        "-p",
+        "--platform",
+        help="Platform (OS) to compile for. Defaults to the current platform",
+        show_default=False,
+    ),
 ):
-    venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
+    venv_configs = _create_internal_venv_configs(
+        venvs, venv_names, venv_folder, versions=versions, platforms=platforms
+    )
     return _loop_sequential_progress(
         venv_configs,
         compile_venv_requirements,
@@ -113,7 +129,11 @@ def run_all(
 
 
 def _create_internal_venv_configs(
-    venvs: Optional[Venvs], venv_names: Optional[List[str]], venv_folder: Path
+    venvs: Optional[Venvs],
+    venv_names: Optional[List[str]],
+    venv_folder: Path,
+    versions: Optional[List[str]] = None,
+    platforms: Optional[List[str]] = None,
 ):
     if not venvs:
         raise MutlivenvConfigVenvsNotDefinedException(
@@ -121,7 +141,13 @@ def _create_internal_venv_configs(
         )
     venv_names = venv_names or [v for v in venvs]
     venv_configs = [
-        VenvConfig.from_user_config(venv_config, name, venv_folder / name)
+        VenvConfig.from_user_config(
+            venv_config,
+            name,
+            venv_folder / name,
+            global_versions=versions,
+            global_platforms=platforms,
+        )
         for name, venv_config in venvs.items()
         if name in venv_names
     ]

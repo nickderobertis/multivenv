@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -7,6 +7,8 @@ from pydantic import BaseModel
 class VenvUserConfig(BaseModel):
     requirements_in: Optional[Path] = None
     requirements_out: Optional[Path] = None
+    versions: Optional[List[str]] = None
+    platforms: Optional[List[str]] = None
 
 
 class VenvConfig(BaseModel):
@@ -14,13 +16,26 @@ class VenvConfig(BaseModel):
     path: Path
     requirements_in: Path
     requirements_out: Path
+    versions: List[str]
+    platforms: List[str]
 
     @classmethod
     def from_user_config(
-        cls, user_config: Optional[VenvUserConfig], name: str, path: Path
+        cls,
+        user_config: Optional[VenvUserConfig],
+        name: str,
+        path: Path,
+        global_versions: Optional[List[str]] = None,
+        global_platforms: Optional[List[str]] = None,
     ):
         user_requirements_in = user_config.requirements_in if user_config else None
         user_requirements_out = user_config.requirements_out if user_config else None
+        versions = (
+            global_versions or (user_config.versions if user_config else None) or []
+        )
+        platforms = (
+            global_platforms or (user_config.platforms if user_config else None) or []
+        )
 
         requirements_in = _get_requirements_in_path(user_requirements_in, name)
         requirements_out = user_requirements_out or requirements_in.with_suffix(".txt")
@@ -29,6 +44,8 @@ class VenvConfig(BaseModel):
             path=path,
             requirements_in=requirements_in,
             requirements_out=requirements_out,
+            versions=versions,
+            platforms=platforms,
         )
 
 
