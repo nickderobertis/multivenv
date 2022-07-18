@@ -1,11 +1,12 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import cliconf
 import typer
 
 from multivenv.compile import compile_venv_requirements
 from multivenv.config import VenvConfig, VenvUserConfig
+from multivenv.exc import MutlivenvConfigVenvsNotDefinedException, NoSuchVenvException
 from multivenv.run import run_in_venv
 from multivenv.sync import sync_venv
 
@@ -30,24 +31,17 @@ VENV_FOLDER_OPTION = typer.Option(
     show_default=False,
 )
 
+Venvs = Dict[str, Optional[VenvUserConfig]]
+
 
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def sync(
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
-    venvs: Optional[List[VenvUserConfig]] = None,
+    venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
 ):
-    if not venvs:
-        raise ValueError(
-            "Must have venvs defined in the config. Pass --config-gen to set up a new config"
-        )
-    venv_names = venv_names or [v.name for v in venvs]
-    venv_configs = [
-        VenvConfig.from_user_config(venv_config, venv_folder / venv_config.name)
-        for venv_config in venvs
-        if venv_config.name in venv_names
-    ]
+    venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
     for venv_config in venv_configs:
         sync_venv(venv_config)
 
@@ -56,19 +50,10 @@ def sync(
 @cliconf.configure(conf_settings, cliconf_settings)
 def compile(
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
-    venvs: Optional[List[VenvUserConfig]] = None,
+    venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
 ):
-    if not venvs:
-        raise ValueError(
-            "Must have venvs defined in the config. Pass --config-gen to set up a new config"
-        )
-    venv_names = venv_names or [v.name for v in venvs]
-    venv_configs = [
-        VenvConfig.from_user_config(venv_config, venv_folder / venv_config.name)
-        for venv_config in venvs
-        if venv_config.name in venv_names
-    ]
+    venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
     for venv_config in venv_configs:
         compile_venv_requirements(venv_config)
 
@@ -85,19 +70,15 @@ def run(
         ..., help="Name of the virtual environment to run command in"
     ),
     command: List[str] = COMMAND_ARG,
-    venvs: Optional[List[VenvUserConfig]] = None,
+    venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
 ):
-    if not venvs:
-        # TODO: restructure and create specific error for no venvs/config
-        raise ValueError(
-            "Must have venvs defined in the config. Pass --config-gen to set up a new config"
-        )
-    # TODO: check for correct venv name
-    venv_user_config = next(v for v in venvs if v.name == venv_name)
-    venv_config = VenvConfig.from_user_config(
-        venv_user_config, venv_folder / venv_user_config.name
-    )
+    venv_configs = _create_internal_venv_configs(venvs, [venv_name], venv_folder)
+    if len(venv_configs) == 0:
+        raise NoSuchVenvException(f"Could not find {venv_name} in {venvs}")
+    assert len(venv_configs) == 1
+    venv_config = venv_configs[0]
+
     full_command = " ".join(command)
     # TODO: better CLI output
     print(run_in_venv(venv_config, full_command))
@@ -107,21 +88,34 @@ def run(
 @cliconf.configure(conf_settings, cliconf_settings)
 def run_all(
     command: List[str] = COMMAND_ARG,
-    venvs: Optional[List[VenvUserConfig]] = None,
+    venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
 ):
     if not venvs:
         raise ValueError(
             "Must have venvs defined in the config. Pass --config-gen to set up a new config"
         )
-    venv_configs = [
-        VenvConfig.from_user_config(venv_config, venv_folder / venv_config.name)
-        for venv_config in venvs
-    ]
+    venv_configs = _create_internal_venv_configs(venvs, None, venv_folder)
     full_command = " ".join(command)
     for venv_config in venv_configs:
         print(f"Running in {venv_config.name}")
         print(run_in_venv(venv_config, full_command))
+
+
+def _create_internal_venv_configs(
+    venvs: Optional[Venvs], venv_names: Optional[List[str]], venv_folder: Path
+):
+    if not venvs:
+        raise MutlivenvConfigVenvsNotDefinedException(
+            "Must have venvs defined in the config. Pass --config-gen to set up a new config"
+        )
+    venv_names = venv_names or [v for v in venvs]
+    venv_configs = [
+        VenvConfig.from_user_config(venv_config, name, venv_folder / name)
+        for name, venv_config in venvs.items()
+        if name in venv_names
+    ]
+    return venv_configs
 
 
 if __name__ == "__main__":

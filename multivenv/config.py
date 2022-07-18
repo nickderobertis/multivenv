@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 
 class VenvUserConfig(BaseModel):
-    name: str
     requirements_in: Optional[Path] = None
     requirements_out: Optional[Path] = None
 
@@ -17,15 +16,16 @@ class VenvConfig(BaseModel):
     requirements_out: Path
 
     @classmethod
-    def from_user_config(cls, user_config: VenvUserConfig, path: Path):
-        requirements_in = _get_requirements_in_path(
-            user_config.requirements_in, user_config.name
-        )
-        requirements_out = user_config.requirements_out or requirements_in.with_suffix(
-            ".txt"
-        )
+    def from_user_config(
+        cls, user_config: Optional[VenvUserConfig], name: str, path: Path
+    ):
+        user_requirements_in = user_config.requirements_in if user_config else None
+        user_requirements_out = user_config.requirements_out if user_config else None
+
+        requirements_in = _get_requirements_in_path(user_requirements_in, name)
+        requirements_out = user_requirements_out or requirements_in.with_suffix(".txt")
         return cls(
-            name=user_config.name,
+            name=name,
             path=path,
             requirements_in=requirements_in,
             requirements_out=requirements_out,
