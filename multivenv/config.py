@@ -48,6 +48,18 @@ class VenvConfig(BaseModel):
             platforms=platforms,
         )
 
+    def requirements_out_path_for(
+        self, version: Optional[str] = None, platform: Optional[str] = None
+    ) -> Path:
+        suffix = ""
+        if version:
+            suffix += f"-{version}"
+        if platform:
+            suffix += f"-{platform}"
+        suffix += ".txt"
+        name = self.requirements_out.with_suffix("").name + suffix
+        return self.requirements_out.parent / name
+
 
 def _get_requirements_in_path(user_requirements_in: Optional[Path], name: str) -> Path:
     if user_requirements_in is not None:

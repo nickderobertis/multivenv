@@ -16,7 +16,10 @@ def compile_venv_requirements(config: VenvConfig):
     platforms = config.platforms or [None]
     for version, platform in itertools.product(versions, platforms):
         pip_tools_compile(
-            config.requirements_in, config.requirements_out, version, platform
+            config.requirements_in,
+            config.requirements_out_path_for(version, platform),
+            version,
+            platform,
         )
 
 
