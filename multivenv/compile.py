@@ -1,6 +1,6 @@
 import itertools
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from multivenv.config import VenvConfig
 from multivenv.ext_subprocess import CLIResult, run
@@ -12,8 +12,9 @@ def compile_venv_requirements(config: VenvConfig):
         return pip_tools_compile(config.requirements_in, config.requirements_out)
 
     # Multiple versions/platforms, compile on each
-    versions = config.versions or [None]
-    platforms = config.platforms or [None]
+    # TODO: unsure why type ignores are needed here, seems accurate
+    versions: List[Optional[str]] = config.versions or [None]  # type: ignore
+    platforms: List[Optional[str]] = config.platforms or [None]  # type: ignore
     for version, platform in itertools.product(versions, platforms):
         pip_tools_compile(
             config.requirements_in,

@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
+from multivenv import sync
 from multivenv.compile import compile_venv_requirements
 from multivenv.config import VenvConfig
 from multivenv.exc import CompiledRequirementsNotFoundException
@@ -24,7 +25,7 @@ def test_sync(compiled_venv_config: VenvConfig):
 
 
 @patch.object(sys, "version_info", (3, 7, 0, "final", 0))
-@patch.object(sys, "platform", "win32")
+@patch.object(sync, "_get_platform", lambda: "win32")
 def test_sync_specific_platform(compiled_multiplatform_venv_config: VenvConfig):
     venv_config = compiled_multiplatform_venv_config
 
@@ -36,7 +37,7 @@ def test_sync_specific_platform(compiled_multiplatform_venv_config: VenvConfig):
 
 
 @patch.object(sys, "version_info", (3, 7, 0, "final", 0))
-@patch.object(sys, "platform", "wrong")
+@patch.object(sync, "_get_platform", lambda: "wrong")
 def test_sync_on_wrong_platform_without_fallback(
     compiled_multiplatform_venv_config: VenvConfig,
 ):
@@ -47,7 +48,7 @@ def test_sync_on_wrong_platform_without_fallback(
 
 
 @patch.object(sys, "version_info", (3, 7, 0, "final", 0))
-@patch.object(sys, "platform", "wrong")
+@patch.object(sync, "_get_platform", lambda: "wrong")
 def test_sync_on_wrong_platform_with_version_fallback(
     compiled_multiplatform_venv_config: VenvConfig,
 ):

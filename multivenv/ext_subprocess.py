@@ -45,7 +45,7 @@ def run(
         shell=True,
     )
     buffer = b""
-    for c in iter(lambda: process.stdout.read(1), b""):
+    for c in iter(lambda: process.stdout.read(1), b""):  # type: ignore
         if stream:
             printer.print(c.decode(), end="")
         buffer += c

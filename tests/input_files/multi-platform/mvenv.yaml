@@ -4,7 +4,7 @@ venvs:
   basic:
 versions:
   - 3.7
-  - 3.10
+  - "3.10"
 platforms:
   - linux_x86_64
   - win32

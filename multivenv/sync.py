@@ -1,3 +1,4 @@
+import distutils.util
 import sys
 from pathlib import Path
 
@@ -22,7 +23,7 @@ def pip_tools_sync(config: VenvConfig) -> CLIResult:
 def _find_requirements_file(config: VenvConfig) -> Path:
     # TODO: better python version matching
     current_python_version = f"{sys.version_info[0]}.{sys.version_info[1]}"
-    current_platform = sys.platform
+    current_platform = _get_platform()
     exact_path = config.requirements_out_path_for(
         current_python_version, current_platform
     )
@@ -44,3 +45,7 @@ def _find_requirements_file(config: VenvConfig) -> Path:
             f"Could not find requirements file at any of {exact_path}, {platform_path}, {version_path}, or {fallback_path}"
         )
     return fallback_path
+
+
+def _get_platform() -> str:
+    return distutils.util.get_platform()
