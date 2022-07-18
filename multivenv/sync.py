@@ -42,10 +42,15 @@ def _find_requirements_file(config: VenvConfig) -> Path:
     fallback_path = config.requirements_out
     if not fallback_path.exists():
         raise CompiledRequirementsNotFoundException(
-            f"Could not find requirements file at any of {exact_path}, {platform_path}, {version_path}, or {fallback_path}"
+            f"Could not find requirements file at any of "
+            f"{exact_path}, {platform_path}, {version_path}, or {fallback_path}"
         )
     return fallback_path
 
 
 def _get_platform() -> str:
-    return distutils.util.get_platform()
+    # TODO: Add handling for manylinux1
+    #  See: https://peps.python.org/pep-0513/
+
+    # See: https://peps.python.org/pep-0425/#platform-tag
+    return distutils.util.get_platform().replace("-", "_").replace(".", "_")
