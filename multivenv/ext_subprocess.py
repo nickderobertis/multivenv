@@ -5,6 +5,8 @@ from typing import Mapping, NamedTuple, Optional
 
 from pydantic import BaseModel
 
+from multivenv.styles import printer
+
 
 class CLIResult(BaseModel):
     output: str
@@ -26,6 +28,7 @@ def run(
     env: Optional[Mapping[str, str]] = None,
     extend_existing_env: bool = False,
     check: bool = True,
+    stream: bool = True,
 ) -> CLIResult:
     use_env = env
     if env is not None:
@@ -34,17 +37,25 @@ def run(
             use_env.update(env)
         else:
             use_env = env
-    result = subprocess.run(
+    process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        check=check,
         env=use_env,
         shell=True,
     )
+    buffer = b""
+    for c in iter(lambda: process.stdout.read(1), b""):
+        if stream:
+            printer.print(c.decode(), end="")
+        buffer += c
+    process.wait()
+    if check and process.returncode != 0:
+        raise subprocess.CalledProcessError(process.returncode, command)
+
     return CLIResult(
-        output=result.stdout.decode(),
-        exit_code=result.returncode,
+        output=buffer.decode(),
+        exit_code=process.returncode,
     )
 
 

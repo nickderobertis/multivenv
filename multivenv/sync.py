@@ -10,4 +10,4 @@ def sync_venv(config: VenvConfig):
 
 def pip_tools_sync(config: VenvConfig) -> CLIResult:
     create_venv_if_not_exists(config)
-    return run_in_venv(config, f"pip-sync {config.requirements_out}")
+    return run_in_venv(config, f"pip-sync {config.requirements_out}", stream=False)

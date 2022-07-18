@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Dict, Iterable, List, Optional, TypeVar
+from typing import Any, Callable, Dict, Iterable, List, Optional, TypeVar
 
 import cliconf
 import typer
@@ -90,8 +90,7 @@ def run(
     venv_config = venv_configs[0]
 
     full_command = " ".join(command)
-    # TODO: better CLI output
-    print(run_in_venv(venv_config, full_command))
+    run_in_venv(venv_config, full_command)
 
 
 @cli.command()
@@ -108,8 +107,9 @@ def run_all(
     venv_configs = _create_internal_venv_configs(venvs, None, venv_folder)
     full_command = " ".join(command)
     for venv_config in venv_configs:
-        print(f"Running in {venv_config.name}")
-        print(run_in_venv(venv_config, full_command))
+        # TODO: add progress bar for run all. Need to create two separate sections in a live display
+        print(f"Running command in {venv_config.name}")
+        run_in_venv(venv_config, full_command)
 
 
 def _create_internal_venv_configs(
@@ -133,7 +133,7 @@ T = TypeVar("T")
 
 def _loop_sequential_progress(
     iterable: Iterable[T],
-    fn: Callable[[T], None],
+    fn: Callable[[T], Any],
     before_message_fn: Callable[[T], str],
     after_message_fn: Callable[[T], str],
 ):

@@ -14,4 +14,5 @@ def pip_tools_compile(requirements_in: Path, requirements_out: Path) -> CLIResul
         f"pip-compile {requirements_in} -o {requirements_out}",
         env=env,
         extend_existing_env=True,
+        stream=False,
     )

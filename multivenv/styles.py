@@ -26,6 +26,9 @@ class ConsolePrinter:
     def __init__(self, console: Console):
         self.console = console
 
+    def print(self, message: str, end: str = "\n"):
+        self.console.print(message, end=end)
+
     def info(self, message: str):
         self.console.print(styled(message, self.styles["info"]))
 

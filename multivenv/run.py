@@ -8,9 +8,9 @@ from multivenv.ext_subprocess import (
 )
 
 
-def run_in_venv(config: VenvConfig, command: str) -> CLIResult:
+def run_in_venv(config: VenvConfig, command: str, stream: bool = True) -> CLIResult:
     new_command = _venv_command(config, command)
-    return run(new_command)
+    return run(new_command, stream=stream)
 
 
 def _venv_command(config: VenvConfig, command: str) -> str:
