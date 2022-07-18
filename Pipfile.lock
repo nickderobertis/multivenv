@@ -199,11 +199,11 @@
         },
         "cliconf": {
             "hashes": [
-                "sha256:768b5d1a7371b5654675115da0c065c4697114d2dac4443df562914c0edb1450",
-                "sha256:a354a356faf71ad0d784945caae0c384811ef9ac27ca783a571b7f04470e2855"
+                "sha256:a9202237f4778a785bf74ec450d046945ae0df50100076da22522e5fad51872e",
+                "sha256:f5d0c72cc2ffad4f5c4828c8f5ea71f3aa0fb914076990a22d283c0adaadb66b"
             ],
             "index": "pypi",
-            "version": "==1.0.0a6"
+            "version": "==1.0.0a9"
         },
         "colorama": {
             "hashes": [

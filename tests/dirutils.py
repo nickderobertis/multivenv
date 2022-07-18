@@ -1,4 +1,5 @@
 import contextlib
+import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -21,3 +22,11 @@ def create_temp_path() -> Iterator[Path]:
     temp_path = Path(temp_dir.name).resolve()
     yield temp_path
     shutil.rmtree(temp_path, ignore_errors=True)
+
+
+@contextlib.contextmanager
+def change_directory_to(path: Path):
+    current_path = os.getcwd()
+    os.chdir(path)
+    yield
+    os.chdir(current_path)

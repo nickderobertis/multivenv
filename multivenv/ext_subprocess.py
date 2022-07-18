@@ -9,6 +9,17 @@ from pydantic import BaseModel
 class CLIResult(BaseModel):
     stdout: str
     stderr: str
+    exit_code: int
+
+    def __str__(self) -> str:
+        output = ""
+        if self.exit_code == 0:
+            output += f"Exited with code {self.exit_code}."
+        if self.stderr:
+            output += f"\nStderr:\n{self.stderr}"
+        if self.stdout:
+            output += f"\nStdout:\n{self.stdout}"
+        return output
 
 
 def run(
@@ -26,7 +37,11 @@ def run(
     result = subprocess.run(
         command, capture_output=True, check=True, env=use_env, shell=True
     )
-    return CLIResult(stdout=result.stdout.decode(), stderr=result.stderr.decode())
+    return CLIResult(
+        stdout=result.stdout.decode(),
+        stderr=result.stderr.decode(),
+        exit_code=result.returncode,
+    )
 
 
 class FirstArgAndCommand(NamedTuple):

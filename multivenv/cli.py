@@ -17,7 +17,7 @@ cliconf_settings = cliconf.CLIConfSettings(recursive_loading=True)
 
 COMMAND_ARG = typer.Argument(..., help="Command to run")
 VENV_NAMES_ARG = typer.Argument(
-    ...,
+    None,
     help="Names of the virtual environments to work on. Defaults to all",
     show_default=False,
 )
@@ -34,7 +34,7 @@ VENV_FOLDER_OPTION = typer.Option(
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def sync(
-    venv_names: List[str] = VENV_NAMES_ARG,
+    venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[List[VenvUserConfig]] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
 ):
@@ -55,7 +55,7 @@ def sync(
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def compile(
-    venv_names: List[str] = VENV_NAMES_ARG,
+    venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[List[VenvUserConfig]] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
 ):
@@ -84,11 +84,12 @@ def run(
     venv_name: str = typer.Argument(
         ..., help="Name of the virtual environment to run command in"
     ),
-    command: str = COMMAND_ARG,
+    command: List[str] = COMMAND_ARG,
     venvs: Optional[List[VenvUserConfig]] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
 ):
     if not venvs:
+        # TODO: restructure and create specific error for no venvs/config
         raise ValueError(
             "Must have venvs defined in the config. Pass --config-gen to set up a new config"
         )
@@ -97,13 +98,15 @@ def run(
     venv_config = VenvConfig.from_user_config(
         venv_user_config, venv_folder / venv_user_config.name
     )
-    run_in_venv(venv_config, command)
+    full_command = " ".join(command)
+    # TODO: better CLI output
+    print(run_in_venv(venv_config, full_command))
 
 
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def run_all(
-    command: str = COMMAND_ARG,
+    command: List[str] = COMMAND_ARG,
     venvs: Optional[List[VenvUserConfig]] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
 ):
@@ -115,8 +118,10 @@ def run_all(
         VenvConfig.from_user_config(venv_config, venv_folder / venv_config.name)
         for venv_config in venvs
     ]
+    full_command = " ".join(command)
     for venv_config in venv_configs:
-        run_in_venv(venv_config, command)
+        print(f"Running in {venv_config.name}")
+        print(run_in_venv(venv_config, full_command))
 
 
 if __name__ == "__main__":

@@ -13,8 +13,8 @@ class VenvUserConfig(BaseModel):
 class VenvConfig(BaseModel):
     name: str
     path: Path
-    requirements_in: Path = None
-    requirements_out: Path = None
+    requirements_in: Path
+    requirements_out: Path
 
     @classmethod
     def from_user_config(cls, user_config: VenvUserConfig, path: Path):
