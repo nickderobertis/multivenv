@@ -7,25 +7,25 @@ from pydantic import BaseModel
 
 
 class CLIResult(BaseModel):
-    stdout: str
-    stderr: str
+    output: str
     exit_code: int
 
     def __str__(self) -> str:
         output = ""
-        if self.exit_code == 0:
-            output += f"Exited with code {self.exit_code}."
-        if self.stderr:
-            output += f"\nStderr:\n{self.stderr}"
-        if self.stdout:
-            output += f"\nStdout:\n{self.stdout}"
+        if self.exit_code != 0:
+            output += f"Exited with code {self.exit_code}.\n"
+        output += self.output
         return output
+
+    def __contains__(self, item):
+        return item in str(self)
 
 
 def run(
     command: str,
     env: Optional[Mapping[str, str]] = None,
     extend_existing_env: bool = False,
+    check: bool = True,
 ) -> CLIResult:
     use_env = env
     if env is not None:
@@ -35,11 +35,15 @@ def run(
         else:
             use_env = env
     result = subprocess.run(
-        command, capture_output=True, check=True, env=use_env, shell=True
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=check,
+        env=use_env,
+        shell=True,
     )
     return CLIResult(
-        stdout=result.stdout.decode(),
-        stderr=result.stderr.decode(),
+        output=result.stdout.decode(),
         exit_code=result.returncode,
     )
 
