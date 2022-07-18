@@ -16,7 +16,8 @@ def test_run_command_with_failure_and_no_raise():
     result = run(fake_command, check=False)
     assert result.exit_code != 0
     assert "Exited with code 1" in result
-    assert f"{fake_command}: not found" in result
+    assert fake_command in result
+    assert "not found" in result
 
 
 def test_run_command_with_failure_and_raise():
