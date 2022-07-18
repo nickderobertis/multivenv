@@ -1,8 +1,15 @@
+from enum import Enum
 from pathlib import Path
+from typing import List
 
 from pydantic import BaseModel
 
 from multivenv.config import VenvConfig
+
+
+class InfoFormat(str, Enum):
+    TEXT = "text"
+    JSON = "json"
 
 
 class VenvInfo(BaseModel):
@@ -11,6 +18,10 @@ class VenvInfo(BaseModel):
     exists: bool
     requirements_in: Path
     requirements_out: Path
+
+
+class AllInfo(BaseModel):
+    __root__: List[VenvInfo]
 
 
 def create_venv_info(config: VenvConfig) -> VenvInfo:

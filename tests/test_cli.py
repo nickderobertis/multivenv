@@ -1,3 +1,4 @@
+import json
 import shlex
 import shutil
 import subprocess
@@ -194,6 +195,21 @@ def test_info_no_venv(temp_dir: Path):
         assert "requirements.txt" in output.stdout
         assert "requirements.in" in output.stdout
         assert "exists=False" in output.stdout
+
+
+def test_info_json(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        output = run_cli("info --info-format json")
+        data = json.loads(output.stdout)
+        info = data[0]
+        assert info["name"] == "basic"
+        assert "venvs" in info["path"]
+        assert "requirements.txt" in output.stdout
+        assert info["requirements_in"] == "requirements.in"
+        assert info["requirements_out"] == "requirements.txt"
+        assert info["exists"] is False
 
 
 def test_info_with_venv(temp_dir: Path):

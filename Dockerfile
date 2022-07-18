@@ -1,5 +1,8 @@
 FROM python:3.10
 
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install jq -y
+
 WORKDIR app
 
 RUN pip install pipenv

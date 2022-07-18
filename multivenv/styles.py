@@ -2,6 +2,8 @@ from typing import Final
 
 from rich.console import Console
 
+from multivenv.types import HasStr
+
 console: Final[Console] = Console()
 
 
@@ -26,7 +28,7 @@ class ConsolePrinter:
     def __init__(self, console: Console):
         self.console = console
 
-    def print(self, message: str, end: str = "\n"):
+    def print(self, message: HasStr, end: str = "\n"):
         self.console.print(message, end=end)
 
     def info(self, message: str):

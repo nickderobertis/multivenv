@@ -8,7 +8,7 @@ from rich.progress import Progress
 from multivenv.compile import compile_venv_requirements
 from multivenv.config import VenvConfig, VenvUserConfig
 from multivenv.exc import MutlivenvConfigVenvsNotDefinedException, NoSuchVenvException
-from multivenv.info import create_venv_info
+from multivenv.info import AllInfo, InfoFormat, create_venv_info
 from multivenv.run import ErrorHandling, run_in_venv
 from multivenv.styles import printer, styled
 from multivenv.sync import sync_venv
@@ -165,6 +165,13 @@ def run_all(
 @cliconf.configure(conf_settings, cliconf_settings)
 def info(
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
+    info_format: InfoFormat = typer.Option(
+        InfoFormat.TEXT,
+        "--info-format",
+        "-i",
+        help="Output format for venv info. Defaults to text.",
+        show_default=False,
+    ),
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
     versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
@@ -173,8 +180,15 @@ def info(
     venv_configs = _create_internal_venv_configs(
         venvs, venv_names, venv_folder, versions=versions, platforms=platforms
     )
-    all_info = [create_venv_info(venv_config) for venv_config in venv_configs]
-    printer.print(all_info)
+    all_info = AllInfo(
+        __root__=[create_venv_info(venv_config) for venv_config in venv_configs]
+    )
+    if info_format == InfoFormat.TEXT:
+        printer.print(all_info.__root__)
+    elif info_format == InfoFormat.JSON:
+        printer.print(all_info.json(indent=2))
+    else:
+        raise NotImplementedError(f"Info format {info_format} not implemented")
 
 
 def _create_internal_venv_configs(
