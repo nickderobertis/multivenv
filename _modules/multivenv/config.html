@@ -46,7 +46,7 @@
   
   
   
-    <title>multivenv.config &#8212; multivenv 1.0.0a4 documentation</title>
+    <title>multivenv.config &#8212; multivenv 1.0.0a5 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -88,7 +88,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../../index.html" title="multivenv 1.0.0a4 documentation"
+        <a href="../../index.html" title="multivenv 1.0.0a5 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe869</i>
@@ -174,7 +174,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a4 documentation</a></li>
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a5 documentation</a></li>
           <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Module code</a></li>
       </ul>
     </div>
@@ -187,13 +187,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../../index.html" title="multivenv 1.0.0a4 documentation" class="md-nav__button md-logo">
+    <a href="../../index.html" title="multivenv 1.0.0a5 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe869</i>
       
     </a>
     <a href="../../index.html"
-       title="multivenv 1.0.0a4 documentation">multivenv</a>
+       title="multivenv 1.0.0a5 documentation">multivenv</a>
   </label>
     <div class="md-nav__source">
       <a href="https://github.com/nickderobertis/multivenv" title="Go to repository" class="md-source" data-md-source="github">
@@ -263,14 +263,16 @@
             
   <h1 id="modules-multivenv-config--page-root">Source code for multivenv.config</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 
 
 <div class="viewcode-block" id="VenvUserConfig"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.config.VenvUserConfig">[docs]</a><span class="k">class</span> <span class="nc">VenvUserConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">requirements_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">requirements_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">requirements_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">versions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">platforms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="VenvConfig"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.config.VenvConfig">[docs]</a><span class="k">class</span> <span class="nc">VenvConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
@@ -278,13 +280,26 @@
     <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
     <span class="n">requirements_in</span><span class="p">:</span> <span class="n">Path</span>
     <span class="n">requirements_out</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">versions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">platforms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 
 <div class="viewcode-block" id="VenvConfig.from_user_config"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.config.VenvConfig.from_user_config">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_user_config</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">user_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VenvUserConfig</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">user_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">VenvUserConfig</span><span class="p">],</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">global_versions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">global_platforms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">user_requirements_in</span> <span class="o">=</span> <span class="n">user_config</span><span class="o">.</span><span class="n">requirements_in</span> <span class="k">if</span> <span class="n">user_config</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">user_requirements_out</span> <span class="o">=</span> <span class="n">user_config</span><span class="o">.</span><span class="n">requirements_out</span> <span class="k">if</span> <span class="n">user_config</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">versions</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">global_versions</span> <span class="ow">or</span> <span class="p">(</span><span class="n">user_config</span><span class="o">.</span><span class="n">versions</span> <span class="k">if</span> <span class="n">user_config</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="p">)</span>
+        <span class="n">platforms</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">global_platforms</span> <span class="ow">or</span> <span class="p">(</span><span class="n">user_config</span><span class="o">.</span><span class="n">platforms</span> <span class="k">if</span> <span class="n">user_config</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="p">)</span>
 
         <span class="n">requirements_in</span> <span class="o">=</span> <span class="n">_get_requirements_in_path</span><span class="p">(</span><span class="n">user_requirements_in</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="n">requirements_out</span> <span class="o">=</span> <span class="n">user_requirements_out</span> <span class="ow">or</span> <span class="n">requirements_in</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".txt"</span><span class="p">)</span>
@@ -293,7 +308,21 @@
             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
             <span class="n">requirements_in</span><span class="o">=</span><span class="n">requirements_in</span><span class="p">,</span>
             <span class="n">requirements_out</span><span class="o">=</span><span class="n">requirements_out</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+            <span class="n">versions</span><span class="o">=</span><span class="n">versions</span><span class="p">,</span>
+            <span class="n">platforms</span><span class="o">=</span><span class="n">platforms</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="VenvConfig.requirements_out_path_for"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.config.VenvConfig.requirements_out_path_for">[docs]</a>    <span class="k">def</span> <span class="nf">requirements_out_path_for</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">platform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="k">if</span> <span class="n">version</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"-</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"-</span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">suffix</span> <span class="o">+=</span> <span class="s2">".txt"</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">requirements_out</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="n">suffix</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">requirements_out</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">name</span></div></div>
 
 
 <span class="k">def</span> <span class="nf">_get_requirements_in_path</span><span class="p">(</span><span class="n">user_requirements_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
