@@ -46,7 +46,7 @@
   
   
   
-    <title>multivenv.run &#8212; multivenv 1.0.0a5 documentation</title>
+    <title>multivenv.run &#8212; multivenv 1.0.0a6 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -88,7 +88,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../../index.html" title="multivenv 1.0.0a5 documentation"
+        <a href="../../index.html" title="multivenv 1.0.0a6 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe869</i>
@@ -174,7 +174,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a5 documentation</a></li>
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a6 documentation</a></li>
           <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Module code</a></li>
       </ul>
     </div>
@@ -187,13 +187,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../../index.html" title="multivenv 1.0.0a5 documentation" class="md-nav__button md-logo">
+    <a href="../../index.html" title="multivenv 1.0.0a6 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe869</i>
       
     </a>
     <a href="../../index.html"
-       title="multivenv 1.0.0a5 documentation">multivenv</a>
+       title="multivenv 1.0.0a6 documentation">multivenv</a>
   </label>
     <div class="md-nav__source">
       <a href="https://github.com/nickderobertis/multivenv" title="Go to repository" class="md-source" data-md-source="github">
@@ -263,6 +263,7 @@
             
   <h1 id="modules-multivenv-run--page-root">Source code for multivenv.run</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="kn">from</span> <span class="nn">multivenv.config</span> <span class="kn">import</span> <span class="n">VenvConfig</span>
 <span class="kn">from</span> <span class="nn">multivenv.ext_subprocess</span> <span class="kn">import</span> <span class="p">(</span>
@@ -272,9 +273,24 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="run_in_venv"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.run.run_in_venv">[docs]</a><span class="k">def</span> <span class="nf">run_in_venv</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">VenvConfig</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stream</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CLIResult</span><span class="p">:</span>
+<div class="viewcode-block" id="ErrorHandling"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.run.ErrorHandling">[docs]</a><span class="k">class</span> <span class="nc">ErrorHandling</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">IGNORE</span> <span class="o">=</span> <span class="s2">"ignore"</span>
+    <span class="n">RAISE</span> <span class="o">=</span> <span class="s2">"raise"</span>
+    <span class="n">PROPAGATE</span> <span class="o">=</span> <span class="s2">"propagate"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">should_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">ErrorHandling</span><span class="o">.</span><span class="n">RAISE</span></div>
+
+
+<div class="viewcode-block" id="run_in_venv"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.run.run_in_venv">[docs]</a><span class="k">def</span> <span class="nf">run_in_venv</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">VenvConfig</span><span class="p">,</span>
+    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">stream</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">errors</span><span class="p">:</span> <span class="n">ErrorHandling</span> <span class="o">=</span> <span class="n">ErrorHandling</span><span class="o">.</span><span class="n">PROPAGATE</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CLIResult</span><span class="p">:</span>
     <span class="n">new_command</span> <span class="o">=</span> <span class="n">_venv_command</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">run</span><span class="p">(</span><span class="n">new_command</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">run</span><span class="p">(</span><span class="n">new_command</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">should_check</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_venv_command</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">VenvConfig</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
