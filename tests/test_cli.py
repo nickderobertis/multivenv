@@ -22,6 +22,7 @@ from tests.config import (
 )
 from tests.dirutils import change_directory_to
 from tests.fixtures.temp_dir import *
+from tests.osutils import is_not_found_output
 from tests.venvutils import get_installed_packages_in_venv
 
 runner = CLIRunner()
@@ -142,7 +143,7 @@ def test_run_cli_error_propagate(temp_dir: Path):
         run_cli("sync")
         # Propagate is the default, no need to add option
         output = run_cli("run basic sdfsdfsgsdfgsdfgf")
-        assert "not found" in output.stdout
+        assert is_not_found_output(output.stdout)
         assert "CalledProcessError" not in output.stdout
         assert output.exit_code != 0
 
@@ -154,7 +155,7 @@ def test_run_cli_error_ignore(temp_dir: Path):
     with change_directory_to(temp_dir):
         run_cli("sync")
         output = run_cli("run --errors ignore basic sdfsdfsgsdfgsdfgf")
-        assert "not found" in output.stdout
+        assert is_not_found_output(output.stdout)
         assert "CalledProcessError" not in output.stdout
         assert output.exit_code == 0
 
@@ -168,7 +169,7 @@ def test_run_cli_error_raise(temp_dir: Path):
         output = run_cli(
             "run --errors raise basic sdfsdfsgsdfgsdfgf", catch_exceptions=True
         )
-        assert "not found" in output.stdout
+        assert is_not_found_output(output.stdout)
         assert output.exit_code != 0
         assert isinstance(output.exception, subprocess.CalledProcessError)
 

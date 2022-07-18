@@ -3,6 +3,7 @@ import subprocess
 import pytest
 
 from multivenv.ext_subprocess import run
+from tests.osutils import is_not_found_output
 
 
 def test_run_command_with_success():
@@ -17,7 +18,7 @@ def test_run_command_with_failure_and_no_raise():
     assert result.exit_code != 0
     assert "Exited with code 1" in result
     assert fake_command in result
-    assert "not found" in result
+    assert is_not_found_output(result)
 
 
 def test_run_command_with_failure_and_raise():
