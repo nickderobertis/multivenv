@@ -1,7 +1,8 @@
 from pathlib import Path
 
 import pytest
-from flexlate.temp_path import create_temp_path
+
+from tests.dirutils import create_temp_path
 
 
 @pytest.fixture
