@@ -1,9 +1,11 @@
 import shlex
 import shutil
+import subprocess
 import sys
 from typing import Sequence
 from unittest.mock import patch
 
+import pytest
 from click.testing import Result
 from cliconf import CLIConf
 from cliconf.testing import CLIRunner
@@ -29,9 +31,9 @@ class CLIRunnerException(Exception):
     pass
 
 
-def run_cli(command: str) -> Result:
+def run_cli(command: str, catch_exceptions: bool = False) -> Result:
     args = shlex.split(command)
-    result = runner.invoke(cli, args, catch_exceptions=False)
+    result = runner.invoke(cli, args, catch_exceptions=catch_exceptions)
     return result
 
 
@@ -132,6 +134,45 @@ def test_run_cli(temp_dir: Path):
         assert "appdirs==1.4.4" in output.stdout
 
 
+def test_run_cli_error_propagate(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        run_cli("sync")
+        # Propagate is the default, no need to add option
+        output = run_cli("run basic sdfsdfsgsdfgsdfgf")
+        assert "not found" in output.stdout
+        assert "CalledProcessError" not in output.stdout
+        assert output.exit_code != 0
+
+
+def test_run_cli_error_ignore(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        run_cli("sync")
+        output = run_cli("run --errors ignore basic sdfsdfsgsdfgsdfgf")
+        assert "not found" in output.stdout
+        assert "CalledProcessError" not in output.stdout
+        assert output.exit_code == 0
+
+
+def test_run_cli_error_raise(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        run_cli("sync")
+        output = run_cli(
+            "run --errors raise basic sdfsdfsgsdfgsdfgf", catch_exceptions=True
+        )
+        assert "not found" in output.stdout
+        assert output.exit_code != 0
+        assert isinstance(output.exception, subprocess.CalledProcessError)
+
+
 def test_run_all_cli(temp_dir: Path):
     shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
     shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
@@ -140,3 +181,6 @@ def test_run_all_cli(temp_dir: Path):
         run_cli("sync")
         output = run_cli("run-all pip freeze")
         assert "appdirs==1.4.4" in output.stdout
+
+
+# TODO: Tests for run-all error handling

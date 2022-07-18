@@ -1,4 +1,5 @@
 import platform
+from enum import Enum
 
 from multivenv.config import VenvConfig
 from multivenv.ext_subprocess import (
@@ -8,9 +9,24 @@ from multivenv.ext_subprocess import (
 )
 
 
-def run_in_venv(config: VenvConfig, command: str, stream: bool = True) -> CLIResult:
+class ErrorHandling(str, Enum):
+    IGNORE = "ignore"
+    RAISE = "raise"
+    PROPAGATE = "propagate"
+
+    @property
+    def should_check(self) -> bool:
+        return self == ErrorHandling.RAISE
+
+
+def run_in_venv(
+    config: VenvConfig,
+    command: str,
+    stream: bool = True,
+    errors: ErrorHandling = ErrorHandling.PROPAGATE,
+) -> CLIResult:
     new_command = _venv_command(config, command)
-    return run(new_command, stream=stream)
+    return run(new_command, stream=stream, check=errors.should_check)
 
 
 def _venv_command(config: VenvConfig, command: str) -> str:

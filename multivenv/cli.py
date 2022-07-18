@@ -8,7 +8,7 @@ from rich.progress import Progress
 from multivenv.compile import compile_venv_requirements
 from multivenv.config import VenvConfig, VenvUserConfig
 from multivenv.exc import MutlivenvConfigVenvsNotDefinedException, NoSuchVenvException
-from multivenv.run import run_in_venv
+from multivenv.run import ErrorHandling, run_in_venv
 from multivenv.styles import printer, styled
 from multivenv.sync import sync_venv
 
@@ -19,6 +19,14 @@ conf_settings = cliconf.CLIAppConfig(
 cliconf_settings = cliconf.CLIConfSettings(recursive_loading=True)
 
 COMMAND_ARG = typer.Argument(..., help="Command to run")
+
+ERROR_HANDLING_OPTION = typer.Option(
+    ErrorHandling.PROPAGATE,
+    "-e",
+    "--errors",
+    help="How to handle errors while running commands. Default is to propagate: the CLI "
+    "will exit with the code that the underlying command exited with. ",
+)
 PLATFORMS_OPTION = typer.Option(
     None,
     "-p",
@@ -120,6 +128,7 @@ def run(
     command: List[str] = COMMAND_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
+    errors: ErrorHandling = ERROR_HANDLING_OPTION,
 ):
     venv_configs = _create_internal_venv_configs(venvs, [venv_name], venv_folder)
     if len(venv_configs) == 0:
@@ -128,7 +137,9 @@ def run(
     venv_config = venv_configs[0]
 
     full_command = " ".join(command)
-    run_in_venv(venv_config, full_command)
+    result = run_in_venv(venv_config, full_command, errors=errors)
+    if errors == ErrorHandling.PROPAGATE:
+        exit(result.exit_code)
 
 
 @cli.command()
@@ -137,6 +148,7 @@ def run_all(
     command: List[str] = COMMAND_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
+    errors: ErrorHandling = ERROR_HANDLING_OPTION,
 ):
     if not venvs:
         raise ValueError(
@@ -147,7 +159,9 @@ def run_all(
     for venv_config in venv_configs:
         # TODO: add progress bar for run all. Need to create two separate sections in a live display
         print(f"Running command in {venv_config.name}")
-        run_in_venv(venv_config, full_command)
+        result = run_in_venv(venv_config, full_command, errors=errors)
+        if errors == ErrorHandling.PROPAGATE and result.exit_code != 0:
+            exit(result.exit_code)
 
 
 def _create_internal_venv_configs(
