@@ -184,4 +184,30 @@ def test_run_all_cli(temp_dir: Path):
         assert "appdirs==1.4.4" in output.stdout
 
 
+def test_info_no_venv(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        output = run_cli("info")
+        assert "basic" in output.stdout
+        assert "venvs" in output.stdout
+        assert "requirements.txt" in output.stdout
+        assert "requirements.in" in output.stdout
+        assert "exists=False" in output.stdout
+
+
+def test_info_with_venv(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        run_cli("sync")
+        output = run_cli("info")
+        assert "basic" in output.stdout
+        assert "venvs" in output.stdout
+        assert "requirements.txt" in output.stdout
+        assert "requirements.in" in output.stdout
+        assert "exists=True" in output.stdout
+
+
 # TODO: Tests for run-all error handling

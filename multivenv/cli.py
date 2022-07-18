@@ -8,6 +8,7 @@ from rich.progress import Progress
 from multivenv.compile import compile_venv_requirements
 from multivenv.config import VenvConfig, VenvUserConfig
 from multivenv.exc import MutlivenvConfigVenvsNotDefinedException, NoSuchVenvException
+from multivenv.info import create_venv_info
 from multivenv.run import ErrorHandling, run_in_venv
 from multivenv.styles import printer, styled
 from multivenv.sync import sync_venv
@@ -150,10 +151,6 @@ def run_all(
     venv_folder: Path = VENV_FOLDER_OPTION,
     errors: ErrorHandling = ERROR_HANDLING_OPTION,
 ):
-    if not venvs:
-        raise ValueError(
-            "Must have venvs defined in the config. Pass --config-gen to set up a new config"
-        )
     venv_configs = _create_internal_venv_configs(venvs, None, venv_folder)
     full_command = " ".join(command)
     for venv_config in venv_configs:
@@ -162,6 +159,22 @@ def run_all(
         result = run_in_venv(venv_config, full_command, errors=errors)
         if errors == ErrorHandling.PROPAGATE and result.exit_code != 0:
             exit(result.exit_code)
+
+
+@cli.command()
+@cliconf.configure(conf_settings, cliconf_settings)
+def info(
+    venv_names: Optional[List[str]] = VENV_NAMES_ARG,
+    venvs: Optional[Venvs] = None,
+    venv_folder: Path = VENV_FOLDER_OPTION,
+    versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
+    platforms: Optional[List[str]] = PLATFORMS_OPTION,
+):
+    venv_configs = _create_internal_venv_configs(
+        venvs, venv_names, venv_folder, versions=versions, platforms=platforms
+    )
+    all_info = [create_venv_info(venv_config) for venv_config in venv_configs]
+    printer.print(all_info)
 
 
 def _create_internal_venv_configs(
