@@ -19,6 +19,20 @@ conf_settings = cliconf.CLIAppConfig(
 cliconf_settings = cliconf.CLIConfSettings(recursive_loading=True)
 
 COMMAND_ARG = typer.Argument(..., help="Command to run")
+PLATFORMS_OPTION = typer.Option(
+    None,
+    "-p",
+    "--platform",
+    help="Platform (OS) to compile for. Defaults to the current platform",
+    show_default=False,
+)
+PYTHON_VERSIONS_OPTION = typer.Option(
+    None,
+    "-v",
+    "--version",
+    help="Python versions to compile for. Defaults to the current python version",
+    show_default=False,
+)
 VENV_NAMES_ARG = typer.Argument(
     None,
     help="Names of the virtual environments to work on. Defaults to all",
@@ -58,20 +72,8 @@ def compile(
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
-    versions: Optional[List[str]] = typer.Option(
-        None,
-        "-v",
-        "--version",
-        help="Python versions to compile for. Defaults to the current python version",
-        show_default=False,
-    ),
-    platforms: Optional[List[str]] = typer.Option(
-        None,
-        "-p",
-        "--platform",
-        help="Platform (OS) to compile for. Defaults to the current platform",
-        show_default=False,
-    ),
+    versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
+    platforms: Optional[List[str]] = PLATFORMS_OPTION,
 ):
     venv_configs = _create_internal_venv_configs(
         venvs, venv_names, venv_folder, versions=versions, platforms=platforms
@@ -84,9 +86,29 @@ def compile(
     )
 
 
-def update():
-    # TODO: fill out update after finalizing sync and compile api
-    pass
+@cli.command()
+@cliconf.configure(conf_settings, cliconf_settings)
+def update(
+    venv_names: Optional[List[str]] = VENV_NAMES_ARG,
+    venvs: Optional[Venvs] = None,
+    venv_folder: Path = VENV_FOLDER_OPTION,
+    versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
+    platforms: Optional[List[str]] = PLATFORMS_OPTION,
+):
+    venv_configs = _create_internal_venv_configs(
+        venvs, venv_names, venv_folder, versions=versions, platforms=platforms
+    )
+
+    def compile_and_sync(venv_config: VenvConfig):
+        compile_venv_requirements(venv_config)
+        sync_venv(venv_config)
+
+    return _loop_sequential_progress(
+        venv_configs,
+        compile_and_sync,
+        lambda v: f"Updating {v.name}",
+        lambda v: f"Updated {v.name}",
+    )
 
 
 @cli.command()

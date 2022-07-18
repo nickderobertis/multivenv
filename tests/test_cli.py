@@ -58,6 +58,28 @@ def test_sync_cli(temp_dir: Path):
         assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
 
 
+def test_update_cli(temp_dir: Path):
+    venv_name = "basic"
+    venvs_folder = temp_dir / "venvs"
+    venv_folder = venvs_folder / venv_name
+    expect_requirements_out_path = temp_dir / "requirements.txt"
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        config = VenvConfig(
+            name=venv_name,
+            path=venv_folder,
+            requirements_in=temp_dir / "requirements.in",
+            requirements_out=temp_dir / "requirements.txt",
+            versions=[],
+            platforms=[],
+        )
+        assert not expect_requirements_out_path.exists()
+        run_cli("update")
+        assert expect_requirements_out_path.exists()
+        assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+
+
 def test_run_cli(temp_dir: Path):
     shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
     shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
