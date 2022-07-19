@@ -1,6 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional
+from typing import Iterator, List, Optional
 
 from pydantic import BaseModel
 
@@ -29,6 +29,18 @@ class VenvInfo(BaseModel):
 
 class AllInfo(BaseModel):
     __root__: List[VenvInfo]
+
+    def __getitem__(self, item) -> VenvInfo:
+        return self.__root__[item]
+
+    def __iter__(self) -> Iterator[VenvInfo]:
+        return iter(self.__root__)
+
+    def __len__(self) -> int:
+        return len(self.__root__)
+
+    def __contains__(self, item) -> bool:
+        return item in self.__root__
 
 
 def create_venv_info(config: VenvConfig) -> VenvInfo:

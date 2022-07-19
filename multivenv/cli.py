@@ -59,6 +59,9 @@ VENV_FOLDER_OPTION = typer.Option(
 Venvs = Dict[str, Optional[VenvUserConfig]]
 
 
+# TODO: Detect and reject when user has configured multiple venvs to have the same output requirements file
+
+
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def sync(
@@ -176,7 +179,7 @@ def info(
     venv_folder: Path = VENV_FOLDER_OPTION,
     versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
     platforms: Optional[List[str]] = PLATFORMS_OPTION,
-):
+) -> AllInfo:
     venv_configs = _create_internal_venv_configs(
         venvs, venv_names, venv_folder, versions=versions, platforms=platforms
     )
@@ -189,6 +192,8 @@ def info(
         printer.print(all_info.json(indent=2))
     else:
         raise NotImplementedError(f"Info format {info_format} not implemented")
+
+    return all_info
 
 
 def _create_internal_venv_configs(
