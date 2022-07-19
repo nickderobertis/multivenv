@@ -1,7 +1,7 @@
-import distutils.util
 import sys
 from pathlib import Path
 
+from multivenv import _platform
 from multivenv._config import VenvConfig
 from multivenv._create import create_venv_if_not_exists
 from multivenv._ext_subprocess import CLIResult
@@ -23,7 +23,7 @@ def pip_tools_sync(config: VenvConfig) -> CLIResult:
 def _find_requirements_file(config: VenvConfig) -> Path:
     # TODO: better python version matching
     current_python_version = f"{sys.version_info[0]}.{sys.version_info[1]}"
-    current_platform = _get_platform()
+    current_platform = _platform.get_platform()
     exact_path = config.requirements_out_path_for(
         current_python_version, current_platform
     )
@@ -46,11 +46,3 @@ def _find_requirements_file(config: VenvConfig) -> Path:
             f"{exact_path}, {platform_path}, {version_path}, or {fallback_path}"
         )
     return fallback_path
-
-
-def _get_platform() -> str:
-    # TODO: Add handling for manylinux1
-    #  See: https://peps.python.org/pep-0513/
-
-    # See: https://peps.python.org/pep-0425/#platform-tag
-    return distutils.util.get_platform().replace("-", "_").replace(".", "_")

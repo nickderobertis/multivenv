@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from multivenv._platform import platform_to_pypi_tag
+
 
 class VenvUserConfig(BaseModel):
     requirements_in: Optional[Path] = None
@@ -33,9 +35,10 @@ class VenvConfig(BaseModel):
         versions = (
             global_versions or (user_config.versions if user_config else None) or []
         )
-        platforms = (
+        raw_platforms = (
             global_platforms or (user_config.platforms if user_config else None) or []
         )
+        platforms = [platform_to_pypi_tag(plat) for plat in raw_platforms]
 
         requirements_in = _get_requirements_in_path(user_requirements_in, name)
         requirements_out = user_requirements_out or requirements_in.with_suffix(".txt")
