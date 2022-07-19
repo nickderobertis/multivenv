@@ -43,5 +43,8 @@ class ConsolePrinter:
     def action_required(self, message: str):
         self.console.print(styled(message, self.styles["action_required"]))
 
+    def make_quiet(self):
+        self.console.quiet = True
+
 
 printer = ConsolePrinter(console)

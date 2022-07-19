@@ -42,6 +42,13 @@ PYTHON_VERSIONS_OPTION = typer.Option(
     help="Python versions to compile for. Defaults to the current python version",
     show_default=False,
 )
+QUIET_OPTION = typer.Option(
+    False,
+    "-q",
+    "--quiet",
+    help="Don't print anything to the console",
+    show_default=False,
+)
 VENV_NAMES_ARG = typer.Argument(
     None,
     help="Names of the virtual environments to work on. Defaults to all",
@@ -68,7 +75,11 @@ def sync(
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
+    quiet: bool = QUIET_OPTION,
 ):
+    if quiet:
+        printer.make_quiet()
+
     venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
     return _loop_sequential_progress(
         venv_configs,
@@ -86,7 +97,11 @@ def compile(
     venv_folder: Path = VENV_FOLDER_OPTION,
     versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
     platforms: Optional[List[str]] = PLATFORMS_OPTION,
+    quiet: bool = QUIET_OPTION,
 ):
+    if quiet:
+        printer.make_quiet()
+
     venv_configs = _create_internal_venv_configs(
         venvs, venv_names, venv_folder, versions=versions, platforms=platforms
     )
@@ -106,7 +121,11 @@ def update(
     venv_folder: Path = VENV_FOLDER_OPTION,
     versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
     platforms: Optional[List[str]] = PLATFORMS_OPTION,
+    quiet: bool = QUIET_OPTION,
 ):
+    if quiet:
+        printer.make_quiet()
+
     venv_configs = _create_internal_venv_configs(
         venvs, venv_names, venv_folder, versions=versions, platforms=platforms
     )
@@ -133,7 +152,11 @@ def run(
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
     errors: ErrorHandling = ERROR_HANDLING_OPTION,
+    quiet: bool = QUIET_OPTION,
 ):
+    if quiet:
+        printer.make_quiet()
+
     venv_configs = _create_internal_venv_configs(venvs, [venv_name], venv_folder)
     if len(venv_configs) == 0:
         raise NoSuchVenvException(f"Could not find {venv_name} in {venvs}")
@@ -153,7 +176,11 @@ def run_all(
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
     errors: ErrorHandling = ERROR_HANDLING_OPTION,
+    quiet: bool = QUIET_OPTION,
 ):
+    if quiet:
+        printer.make_quiet()
+
     venv_configs = _create_internal_venv_configs(venvs, None, venv_folder)
     full_command = " ".join(command)
     for venv_config in venv_configs:
@@ -179,7 +206,11 @@ def info(
     venv_folder: Path = VENV_FOLDER_OPTION,
     versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
     platforms: Optional[List[str]] = PLATFORMS_OPTION,
+    quiet: bool = QUIET_OPTION,
 ) -> AllInfo:
+    if quiet:
+        printer.make_quiet()
+
     venv_configs = _create_internal_venv_configs(
         venvs, venv_names, venv_folder, versions=versions, platforms=platforms
     )
