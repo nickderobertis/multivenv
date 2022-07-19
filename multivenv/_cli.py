@@ -5,13 +5,13 @@ import cliconf
 import typer
 from rich.progress import Progress
 
-from multivenv.compile import compile_venv_requirements
-from multivenv.config import VenvConfig, VenvUserConfig
+from multivenv._compile import compile_venv_requirements
+from multivenv._config import VenvConfig, VenvUserConfig
+from multivenv._info import AllInfo, InfoFormat, create_venv_info
+from multivenv._run import ErrorHandling, run_in_venv
+from multivenv._styles import printer, styled
+from multivenv._sync import sync_venv
 from multivenv.exc import MutlivenvConfigVenvsNotDefinedException, NoSuchVenvException
-from multivenv.info import AllInfo, InfoFormat, create_venv_info
-from multivenv.run import ErrorHandling, run_in_venv
-from multivenv.styles import printer, styled
-from multivenv.sync import sync_venv
 
 cli = cliconf.CLIConf(name="mvenv")
 conf_settings = cliconf.CLIAppConfig(

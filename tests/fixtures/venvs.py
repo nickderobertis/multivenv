@@ -1,7 +1,7 @@
 import pytest
 
-from multivenv.config import VenvConfig
-from multivenv.sync import sync_venv
+from multivenv._config import VenvConfig
+from multivenv._sync import sync_venv
 from tests.fixtures.venv_configs import *
 
 

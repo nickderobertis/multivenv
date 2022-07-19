@@ -1,5 +1,5 @@
-from multivenv.config import VenvConfig
-from multivenv.info import create_venv_info
+from multivenv._config import VenvConfig
+from multivenv._info import create_venv_info
 from tests.dirutils import change_directory_to
 from tests.fixtures.venv_configs import *
 

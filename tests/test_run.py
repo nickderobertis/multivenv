@@ -1,4 +1,4 @@
-from multivenv.run import run_in_venv
+from multivenv._run import run_in_venv
 from tests.fixtures.venvs import *
 
 

@@ -1,6 +1,6 @@
-from multivenv.config import VenvConfig
-from multivenv.ext_subprocess import run
-from multivenv.run import run_in_venv
+from multivenv._config import VenvConfig
+from multivenv._ext_subprocess import run
+from multivenv._run import run_in_venv
 
 
 def create_venv(config: VenvConfig):

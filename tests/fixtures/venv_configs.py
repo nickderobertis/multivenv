@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from multivenv.config import VenvConfig, VenvUserConfig
+from multivenv._config import VenvConfig, VenvUserConfig
 from tests.config import (
     REQUIREMENTS_IN_PATH,
     REQUIREMENTS_MULTIPLATFORM_OUT_PATH,

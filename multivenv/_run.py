@@ -1,8 +1,8 @@
 import platform
 from enum import Enum
 
-from multivenv.config import VenvConfig
-from multivenv.ext_subprocess import (
+from multivenv._config import VenvConfig
+from multivenv._ext_subprocess import (
     CLIResult,
     run,
     split_first_arg_of_command_from_rest,

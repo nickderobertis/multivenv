@@ -2,8 +2,8 @@ import itertools
 from pathlib import Path
 from typing import List, Optional
 
-from multivenv.config import VenvConfig
-from multivenv.ext_subprocess import CLIResult, run
+from multivenv._config import VenvConfig
+from multivenv._ext_subprocess import CLIResult, run
 
 
 def compile_venv_requirements(config: VenvConfig):

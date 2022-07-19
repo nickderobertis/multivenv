@@ -2,7 +2,7 @@ import subprocess
 
 import pytest
 
-from multivenv.ext_subprocess import run
+from multivenv._ext_subprocess import run
 from tests.osutils import is_not_found_output
 
 

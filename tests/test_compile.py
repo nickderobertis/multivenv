@@ -1,7 +1,7 @@
 import itertools
 
-from multivenv.compile import compile_venv_requirements
-from multivenv.config import VenvConfig
+from multivenv._compile import compile_venv_requirements
+from multivenv._config import VenvConfig
 from tests.fixtures.venv_configs import *
 
 

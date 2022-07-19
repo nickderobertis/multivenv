@@ -11,9 +11,9 @@ from click.testing import Result
 from cliconf import CLIConf
 from cliconf.testing import CLIRunner
 
-from multivenv import sync
-from multivenv.cli import cli
-from multivenv.config import VenvConfig
+from multivenv import _sync
+from multivenv._cli import cli
+from multivenv._config import VenvConfig
 from tests import ext_click
 from tests.config import (
     BASIC_CONFIG_PATH,
@@ -93,7 +93,7 @@ def test_update_cli(temp_dir: Path):
 
 
 @patch.object(sys, "version_info", (3, 7, 0, "final", 0))
-@patch.object(sync, "_get_platform", lambda: "linux_x86_64")
+@patch.object(_sync, "_get_platform", lambda: "linux_x86_64")
 def test_update_multiplatform_cli(temp_dir: Path):
     venv_name = "basic"
     venvs_folder = temp_dir / "venvs"

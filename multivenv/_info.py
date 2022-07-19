@@ -4,9 +4,9 @@ from typing import Iterator, List, Optional
 
 from pydantic import BaseModel
 
-from multivenv.config import VenvConfig
+from multivenv._config import VenvConfig
+from multivenv._sync import _find_requirements_file
 from multivenv.exc import CompiledRequirementsNotFoundException
-from multivenv.sync import _find_requirements_file
 
 
 class InfoFormat(str, Enum):

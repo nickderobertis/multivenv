@@ -2,11 +2,11 @@ import distutils.util
 import sys
 from pathlib import Path
 
-from multivenv.config import VenvConfig
-from multivenv.create import create_venv_if_not_exists
+from multivenv._config import VenvConfig
+from multivenv._create import create_venv_if_not_exists
+from multivenv._ext_subprocess import CLIResult
+from multivenv._run import run_in_venv
 from multivenv.exc import CompiledRequirementsNotFoundException
-from multivenv.ext_subprocess import CLIResult
-from multivenv.run import run_in_venv
 
 
 def sync_venv(config: VenvConfig):

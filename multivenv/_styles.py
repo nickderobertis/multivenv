@@ -2,7 +2,7 @@ from typing import Final
 
 from rich.console import Console
 
-from multivenv.types import HasStr
+from multivenv._types import HasStr
 
 console: Final[Console] = Console()
 

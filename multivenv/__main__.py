@@ -1,3 +1,3 @@
-from multivenv.cli import cli
+from multivenv._cli import cli
 
 cli()

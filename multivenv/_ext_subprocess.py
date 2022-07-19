@@ -5,7 +5,7 @@ from typing import Mapping, NamedTuple, Optional
 
 from pydantic import BaseModel
 
-from multivenv.styles import printer
+from multivenv._styles import printer
 
 
 class CLIResult(BaseModel):
