@@ -7,6 +7,7 @@ from rich.progress import Progress
 
 from multivenv._compile import compile_venv_requirements
 from multivenv._config import VenvConfig, VenvUserConfig
+from multivenv._delete import delete_venv
 from multivenv._info import AllInfo, InfoFormat, create_venv_info
 from multivenv._run import ErrorHandling, run_in_venv
 from multivenv._styles import printer, styled
@@ -225,6 +226,26 @@ def info(
         raise NotImplementedError(f"Info format {info_format} not implemented")
 
     return all_info
+
+
+@cli.command()
+@cliconf.configure(conf_settings, cliconf_settings)
+def delete(
+    venv_names: Optional[List[str]] = VENV_NAMES_ARG,
+    venvs: Optional[Venvs] = None,
+    venv_folder: Path = VENV_FOLDER_OPTION,
+    quiet: bool = QUIET_OPTION,
+):
+    if quiet:
+        printer.make_quiet()
+
+    venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
+    return _loop_sequential_progress(
+        venv_configs,
+        delete_venv,
+        lambda v: f"Deleting {v.name}",
+        lambda v: f"Deleted {v.name}",
+    )
 
 
 def _create_internal_venv_configs(

@@ -229,3 +229,17 @@ def test_info_with_venv(temp_dir: Path):
 
 
 # TODO: Tests for run-all error handling
+
+
+def test_delete_cli(temp_dir: Path):
+    venv_name = "basic"
+    venvs_folder = temp_dir / "venvs"
+    venv_folder = venvs_folder / venv_name
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        run_cli("sync")
+        assert venv_folder.exists()
+        run_cli("delete")
+        assert not venv_folder.exists()
