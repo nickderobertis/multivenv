@@ -5,12 +5,17 @@ from rich.console import Console
 from multivenv._types import HasStr
 
 console: Final[Console] = Console()
+legacy_windows = console.legacy_windows
 
-
+# Legacy windows does not seem to support unicode, so strip out the emojis on that platform
 INFO_STYLE: Final[str] = ""
-SUCCESS_STYLE: Final[str] = "[green]:heavy_check_mark:"
-ALERT_STYLE: Final[str] = "[red]:x:"
-ACTION_REQUIRED_STYLE: Final[str] = "[yellow]:pencil:"
+SUCCESS_STYLE: Final[str] = (
+    "[green]:heavy_check_mark:" if not legacy_windows else "[green]"
+)
+ALERT_STYLE: Final[str] = "[red]:x:" if not legacy_windows else "[red]"
+ACTION_REQUIRED_STYLE: Final[str] = (
+    "[yellow]:pencil:" if not legacy_windows else "[yellow]"
+)
 
 
 def styled(message: str, style: str) -> str:
