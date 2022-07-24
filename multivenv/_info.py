@@ -43,23 +43,23 @@ class VenvInfo(BaseModel):
     exists: bool
     config_requirements: RequirementsInfo
     discovered_requirements: RequirementsInfo
-    system: SystemInfo = Field(default_factory=SystemInfo.from_system)
 
 
 class AllInfo(BaseModel):
-    __root__: List[VenvInfo]
+    venv_info: List[VenvInfo]
+    system: SystemInfo = Field(default_factory=SystemInfo.from_system)
 
     def __getitem__(self, item) -> VenvInfo:
-        return self.__root__[item]
+        return self.venv_info[item]
 
     def __iter__(self) -> Iterator[VenvInfo]:
-        return iter(self.__root__)
+        return iter(self.venv_info)
 
     def __len__(self) -> int:
-        return len(self.__root__)
+        return len(self.venv_info)
 
     def __contains__(self, item) -> bool:
-        return item in self.__root__
+        return item in self.venv_info
 
 
 def create_venv_info(config: VenvConfig) -> VenvInfo:

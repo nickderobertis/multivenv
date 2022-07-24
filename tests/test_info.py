@@ -1,6 +1,6 @@
 from multivenv import _platform
 from multivenv._config import VenvConfig
-from multivenv._info import create_venv_info
+from multivenv._info import SystemInfo, create_venv_info
 from tests.dirutils import change_directory_to
 from tests.fixtures.venv_configs import *
 
@@ -16,8 +16,10 @@ def test_info(venv_config: VenvConfig):
         assert info.config_requirements.out_path == venv_config.requirements_out
         assert info.discovered_requirements.in_path == venv_config.requirements_in
         assert info.discovered_requirements.out_path is None
-        assert info.system.python_version == _platform.get_python_version()
-        assert info.system.platform == _platform.get_platform()
-        assert info.system.file_extension == "-".join(
-            [info.system.python_version, info.system.platform]
-        )
+
+
+def test_system_info():
+    info = SystemInfo.from_system()
+    assert info.python_version == _platform.get_python_version()
+    assert info.platform == _platform.get_platform()
+    assert info.file_extension == "-".join([info.python_version, info.platform])

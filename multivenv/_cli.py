@@ -216,10 +216,10 @@ def info(
         venvs, venv_names, venv_folder, versions=versions, platforms=platforms
     )
     all_info = AllInfo(
-        __root__=[create_venv_info(venv_config) for venv_config in venv_configs]
+        venv_info=[create_venv_info(venv_config) for venv_config in venv_configs]
     )
     if info_format == InfoFormat.TEXT:
-        printer.print(all_info.__root__)
+        printer.print(all_info)
     elif info_format == InfoFormat.JSON:
         printer.print(all_info.json(indent=2))
     else:
