@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 
 from multivenv import _platform
@@ -21,8 +20,7 @@ def pip_tools_sync(config: VenvConfig) -> CLIResult:
 
 # TODO: Add options to make requirement finding for sync more flexible (strict versus loose)
 def _find_requirements_file(config: VenvConfig) -> Path:
-    # TODO: better python version matching
-    current_python_version = f"{sys.version_info[0]}.{sys.version_info[1]}"
+    current_python_version = _platform.get_python_version()
     current_platform = _platform.get_platform()
     exact_path = config.requirements_out_path_for(
         current_python_version, current_platform

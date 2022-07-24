@@ -212,6 +212,7 @@ def test_info_json(temp_dir: Path):
         assert info["discovered_requirements"]["in_path"] == "requirements.in"
         assert info["discovered_requirements"]["out_path"] == None
         assert info["exists"] is False
+        assert "3." in info["system"]["python_version"]
 
 
 def test_info_with_venv(temp_dir: Path):
@@ -226,6 +227,7 @@ def test_info_with_venv(temp_dir: Path):
         assert "requirements.txt" in output.stdout
         assert "requirements.in" in output.stdout
         assert "exists=True" in output.stdout
+        assert "3." in output.stdout
 
 
 # TODO: Tests for run-all error handling

@@ -1,4 +1,5 @@
 import distutils.util
+import sys
 
 
 def get_platform() -> str:
@@ -7,6 +8,11 @@ def get_platform() -> str:
 
     platform = distutils.util.get_platform()
     return platform_to_pypi_tag(platform)
+
+
+# TODO: better python version matching
+def get_python_version() -> str:
+    return f"{sys.version_info[0]}.{sys.version_info[1]}"
 
 
 def platform_to_pypi_tag(platform: str) -> str:

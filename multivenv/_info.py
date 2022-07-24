@@ -2,8 +2,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Iterator, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from multivenv import _platform
 from multivenv._config import VenvConfig
 from multivenv._sync import _find_requirements_file
 from multivenv.exc import CompiledRequirementsNotFoundException
@@ -19,12 +20,30 @@ class RequirementsInfo(BaseModel):
     out_path: Optional[Path]
 
 
+class SystemInfo(BaseModel):
+    python_version: str
+    platform: str
+    file_extension: str
+
+    @classmethod
+    def from_system(cls) -> "SystemInfo":
+        python_version = _platform.get_python_version()
+        platform = _platform.get_platform()
+        file_extension = "-".join([python_version, platform])
+        return cls(
+            python_version=python_version,
+            platform=platform,
+            file_extension=file_extension,
+        )
+
+
 class VenvInfo(BaseModel):
     name: str
     path: Path
     exists: bool
     config_requirements: RequirementsInfo
     discovered_requirements: RequirementsInfo
+    system: SystemInfo = Field(default_factory=SystemInfo.from_system)
 
 
 class AllInfo(BaseModel):
