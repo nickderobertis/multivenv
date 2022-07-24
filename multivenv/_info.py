@@ -1,3 +1,4 @@
+import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Iterator, List, Optional
@@ -6,7 +7,8 @@ from pydantic import BaseModel, Field
 
 from multivenv import _platform
 from multivenv._config import VenvConfig
-from multivenv._sync import _find_requirements_file
+from multivenv._find_reqs import find_requirements_file
+from multivenv._state import VenvState
 from multivenv.exc import CompiledRequirementsNotFoundException
 
 
@@ -37,12 +39,42 @@ class SystemInfo(BaseModel):
         )
 
 
+class VenvStateInfo(BaseModel):
+    last_synced: Optional[datetime.datetime]
+    requirements_hash: Optional[str]
+    needs_sync: bool
+
+    @classmethod
+    def from_venv_state(
+        cls, state: VenvState, requirements_path: Path
+    ) -> "VenvStateInfo":
+        return cls(
+            last_synced=state.last_synced,
+            requirements_hash=state.requirements_hash,
+            needs_sync=state.needs_sync(requirements_path),
+        )
+
+    @classmethod
+    def from_venv_config(cls, venv_config: VenvConfig) -> "VenvStateInfo":
+        state_path = venv_config.path / "mvenv-state.json"
+        if not state_path.exists():
+            return cls(
+                last_synced=None,
+                requirements_hash=None,
+                needs_sync=True,
+            )
+        state = VenvState.load(venv_config.path / "mvenv-state.json")
+        requirements_path = find_requirements_file(venv_config)
+        return cls.from_venv_state(state, requirements_path)
+
+
 class VenvInfo(BaseModel):
     name: str
     path: Path
     exists: bool
     config_requirements: RequirementsInfo
     discovered_requirements: RequirementsInfo
+    state: VenvStateInfo
 
 
 class AllInfo(BaseModel):
@@ -69,7 +101,7 @@ def create_venv_info(config: VenvConfig) -> VenvInfo:
     )
 
     try:
-        discovered_out_path = _find_requirements_file(config)
+        discovered_out_path = find_requirements_file(config)
     except CompiledRequirementsNotFoundException:
         discovered_out_path = None
 
@@ -78,10 +110,13 @@ def create_venv_info(config: VenvConfig) -> VenvInfo:
         out_path=discovered_out_path,
     )
 
+    state_info = VenvStateInfo.from_venv_config(config)
+
     return VenvInfo(
         name=config.name,
         path=config.path,
         exists=config.path.exists(),
         config_requirements=config_requirements,
         discovered_requirements=discovered_requirements,
+        state=state_info,
     )

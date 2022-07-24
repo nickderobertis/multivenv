@@ -17,6 +17,8 @@ from multivenv._config import VenvConfig
 from tests import ext_click
 from tests.config import (
     BASIC_CONFIG_PATH,
+    BASIC_REQUIREMENTS_HASH,
+    BASIC_STATE_CONFIG_PATH,
     REQUIREMENTS_IN_PATH,
     REQUIREMENTS_MULTIPLATFORM_CONFIG_PATH,
     REQUIREMENTS_OUT_PATH,
@@ -213,6 +215,8 @@ def test_info_json(temp_dir: Path):
         assert info["discovered_requirements"]["out_path"] == None
         assert info["exists"] is False
         assert "3." in data["system"]["python_version"]
+        assert info["state"]["needs_sync"] is True
+        assert info["state"]["requirements_hash"] is None
 
 
 def test_info_with_venv(temp_dir: Path):
@@ -228,6 +232,7 @@ def test_info_with_venv(temp_dir: Path):
         assert "requirements.in" in output.stdout
         assert "exists=True" in output.stdout
         assert "3." in output.stdout
+        assert BASIC_REQUIREMENTS_HASH in output.stdout
 
 
 # TODO: Tests for run-all error handling

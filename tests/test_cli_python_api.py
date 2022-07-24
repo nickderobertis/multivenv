@@ -2,7 +2,12 @@ import shutil
 from pathlib import Path
 
 import multivenv
-from tests.config import REQUIREMENTS_IN_PATH, REQUIREMENTS_OUT_PATH
+from multivenv import _platform
+from tests.config import (
+    BASIC_REQUIREMENTS_HASH,
+    REQUIREMENTS_IN_PATH,
+    REQUIREMENTS_OUT_PATH,
+)
 from tests.dirutils import change_directory_to
 from tests.fixtures.temp_dir import temp_dir
 
@@ -15,6 +20,8 @@ def test_info(temp_dir: Path):
         multivenv.sync(venvs=venvs)
         all_info = multivenv.info(["basic"], venvs=venvs)
         assert len(all_info) == 1
+        assert all_info.system.python_version == _platform.get_python_version()
+        assert all_info.system.platform == _platform.get_platform()
         info = all_info[0]
         assert info.name == "basic"
         assert info.path == Path("venvs", "basic")
@@ -23,3 +30,5 @@ def test_info(temp_dir: Path):
         assert info.discovered_requirements.in_path == Path("requirements.in")
         assert info.discovered_requirements.out_path == Path("requirements.txt")
         assert info.exists is True
+        assert info.state.needs_sync is False
+        assert info.state.requirements_hash == BASIC_REQUIREMENTS_HASH
