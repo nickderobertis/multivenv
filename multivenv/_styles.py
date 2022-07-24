@@ -36,6 +36,9 @@ class ConsolePrinter:
     def print(self, message: HasStr, end: str = "\n"):
         self.console.print(message, end=end)
 
+    def out(self, message: HasStr, end: str = "\n"):
+        self.console.out(message, end=end)
+
     def info(self, message: str):
         self.console.print(styled(message, self.styles["info"]))
 

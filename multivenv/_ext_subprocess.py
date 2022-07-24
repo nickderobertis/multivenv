@@ -45,9 +45,15 @@ def run(
         shell=True,
     )
     buffer = b""
+    char_buffer = b""
     for c in iter(lambda: process.stdout.read(1), b""):  # type: ignore
+        char_buffer += c
         if stream:
-            printer.print(c.decode(), end="")
+            try:
+                printer.out(char_buffer.decode(), end="")
+                char_buffer = b""
+            except UnicodeDecodeError:
+                char_buffer += c
         buffer += c
     process.wait()
     if check and process.returncode != 0:
