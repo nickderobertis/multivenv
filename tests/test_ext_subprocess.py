@@ -1,8 +1,7 @@
-import subprocess
-
 import pytest
 
 from multivenv._ext_subprocess import run
+from multivenv.exc import CommandExitException
 from tests.osutils import is_not_found_output
 
 
@@ -18,11 +17,11 @@ def test_run_command_with_failure_and_no_raise():
     assert result.exit_code != 0
     assert "Exited with code 1" in result
     assert fake_command in result
-    assert is_not_found_output(result)
+    assert is_not_found_output(str(result))
 
 
 def test_run_command_with_failure_and_raise():
     fake_command = "this-command-does-not-exist"
     # TODO: custom error
-    with pytest.raises(subprocess.CalledProcessError):
+    with pytest.raises(CommandExitException):
         run(fake_command)

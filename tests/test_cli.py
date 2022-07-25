@@ -1,7 +1,6 @@
 import json
 import shlex
 import shutil
-import subprocess
 import sys
 from typing import Sequence
 from unittest.mock import patch
@@ -14,6 +13,7 @@ from cliconf.testing import CLIRunner
 from multivenv import _platform
 from multivenv._cli import cli
 from multivenv._config import VenvConfig
+from multivenv.exc import CommandExitException
 from tests import ext_click
 from tests.config import (
     BASIC_CONFIG_PATH,
@@ -147,7 +147,7 @@ def test_run_cli_error_propagate(temp_dir: Path):
         # Propagate is the default, no need to add option
         output = run_cli("run basic sdfsdfsgsdfgsdfgf")
         assert is_not_found_output(output.stdout)
-        assert "CalledProcessError" not in output.stdout
+        assert "CommandExitException" not in output.stdout
         assert output.exit_code != 0
 
 
@@ -159,7 +159,7 @@ def test_run_cli_error_ignore(temp_dir: Path):
         run_cli("sync")
         output = run_cli("run --errors ignore basic sdfsdfsgsdfgsdfgf")
         assert is_not_found_output(output.stdout)
-        assert "CalledProcessError" not in output.stdout
+        assert "CommandExitException" not in output.stdout
         assert output.exit_code == 0
 
 
@@ -174,7 +174,7 @@ def test_run_cli_error_raise(temp_dir: Path):
         )
         assert is_not_found_output(output.stdout)
         assert output.exit_code != 0
-        assert isinstance(output.exception, subprocess.CalledProcessError)
+        assert isinstance(output.exception, CommandExitException)
 
 
 def test_run_all_cli(temp_dir: Path):
