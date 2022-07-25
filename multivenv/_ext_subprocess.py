@@ -73,4 +73,4 @@ class FirstArgAndCommand(NamedTuple):
 
 def split_first_arg_of_command_from_rest(command: str) -> FirstArgAndCommand:
     args = shlex.split(command)
-    return FirstArgAndCommand(args[0], " ".join(args[1:]))
+    return FirstArgAndCommand(args[0], shlex.join(args[1:]))
