@@ -72,5 +72,10 @@ class FirstArgAndCommand(NamedTuple):
 
 
 def split_first_arg_of_command_from_rest(command: str) -> FirstArgAndCommand:
-    args = shlex.split(command)
-    return FirstArgAndCommand(args[0], shlex.join(args[1:]))
+    # TODO: Support for running binaries with spaces in their names.
+    #  This current approach is a bit of a hack. Tried to use shlex.split
+    #  and join, but it does not work properly on Windows.
+    args = command.split()
+    bin = args[0]
+    new_command = " ".join(args[1:])
+    return FirstArgAndCommand(bin, new_command)
