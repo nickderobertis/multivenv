@@ -2,6 +2,7 @@ import subprocess
 
 from multivenv._run import ErrorHandling, run_in_venv
 from multivenv.exc import CommandExitException
+from tests.fixtures.venv_configs import *
 from tests.fixtures.venvs import *
 from tests.osutils import is_not_found_output
 

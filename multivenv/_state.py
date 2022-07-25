@@ -5,6 +5,7 @@ from pathlib import Path
 from pyappconf import AppConfig, BaseConfig, ConfigFormats
 
 from multivenv._config import VenvConfig
+from multivenv._find_reqs import find_requirements_file
 
 
 def create_venv_state(config: VenvConfig) -> "VenvState":
@@ -17,6 +18,15 @@ def update_venv_state(config: VenvConfig, requirements_file: Path) -> "VenvState
     new_state = VenvState.create_from_requirements(requirements_file, config.path)
     new_state.save()
     return new_state
+
+
+def venv_needs_sync(config: VenvConfig) -> bool:
+    try:
+        state = VenvState.load(config.path)
+    except FileNotFoundError:
+        return True
+    requirements_file = find_requirements_file(config)
+    return state.needs_sync(requirements_file)
 
 
 class VenvState(BaseConfig):

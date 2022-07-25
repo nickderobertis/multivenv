@@ -138,6 +138,24 @@ def test_run_cli(temp_dir: Path):
         assert "appdirs==1.4.4" in output.stdout
 
 
+def test_run_cli_auto_sync(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        output = run_cli("run basic pip freeze")
+        assert "appdirs==1.4.4" in output.stdout
+
+
+def test_run_cli_no_auto_sync(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        output = run_cli("run basic pip freeze --no-auto-sync")
+        assert is_not_found_output(output.stdout)
+
+
 def test_run_cli_error_propagate(temp_dir: Path):
     shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
     shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)

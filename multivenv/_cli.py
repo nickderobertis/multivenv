@@ -10,6 +10,7 @@ from multivenv._config import VenvConfig, VenvUserConfig
 from multivenv._delete import delete_venv
 from multivenv._info import AllInfo, InfoFormat, create_venv_info
 from multivenv._run import ErrorHandling, run_in_venv
+from multivenv._state import venv_needs_sync
 from multivenv._styles import printer, styled
 from multivenv._sync import sync_venv
 from multivenv.exc import MutlivenvConfigVenvsNotDefinedException, NoSuchVenvException
@@ -28,6 +29,12 @@ ERROR_HANDLING_OPTION = typer.Option(
     "--errors",
     help="How to handle errors while running commands. Default is to propagate: the CLI "
     "will exit with the code that the underlying command exited with. ",
+)
+NO_AUTO_SYNC_OPTION = typer.Option(
+    False,
+    "-n",
+    "--no-auto-sync",
+    help="Don't sync the venv before running the command",
 )
 PLATFORMS_OPTION = typer.Option(
     None,
@@ -154,15 +161,20 @@ def run(
     venv_folder: Path = VENV_FOLDER_OPTION,
     errors: ErrorHandling = ERROR_HANDLING_OPTION,
     quiet: bool = QUIET_OPTION,
+    no_auto_sync: bool = NO_AUTO_SYNC_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(venvs, [venv_name], venv_folder)
+    auto_sync = not no_auto_sync
     if len(venv_configs) == 0:
         raise NoSuchVenvException(f"Could not find {venv_name} in {venvs}")
     assert len(venv_configs) == 1
     venv_config = venv_configs[0]
+
+    if auto_sync and venv_needs_sync(venv_config):
+        sync_venv(venv_config)
 
     full_command = " ".join(command)
     result = run_in_venv(venv_config, full_command, errors=errors)
@@ -178,15 +190,19 @@ def run_all(
     venv_folder: Path = VENV_FOLDER_OPTION,
     errors: ErrorHandling = ERROR_HANDLING_OPTION,
     quiet: bool = QUIET_OPTION,
+    no_auto_sync: bool = NO_AUTO_SYNC_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(venvs, None, venv_folder)
+    auto_sync = not no_auto_sync
     full_command = " ".join(command)
     for venv_config in venv_configs:
         # TODO: add progress bar for run all. Need to create two separate sections in a live display
         print(f"Running command in {venv_config.name}")
+        if auto_sync and venv_needs_sync(venv_config):
+            sync_venv(venv_config)
         result = run_in_venv(venv_config, full_command, errors=errors)
         if errors == ErrorHandling.PROPAGATE and result.exit_code != 0:
             exit(result.exit_code)
