@@ -46,7 +46,7 @@
   
   
   
-    <title>multivenv.exc &#8212; multivenv 1.0.0a18 documentation</title>
+    <title>multivenv.exc &#8212; multivenv 1.0.0a19 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -88,7 +88,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../../index.html" title="multivenv 1.0.0a18 documentation"
+        <a href="../../index.html" title="multivenv 1.0.0a19 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe869</i>
@@ -174,7 +174,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a18 documentation</a></li>
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">multivenv 1.0.0a19 documentation</a></li>
           <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">Module code</a></li>
       </ul>
     </div>
@@ -187,13 +187,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../../index.html" title="multivenv 1.0.0a18 documentation" class="md-nav__button md-logo">
+    <a href="../../index.html" title="multivenv 1.0.0a19 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe869</i>
       
     </a>
     <a href="../../index.html"
-       title="multivenv 1.0.0a18 documentation">multivenv</a>
+       title="multivenv 1.0.0a19 documentation">multivenv</a>
   </label>
     <div class="md-nav__source">
       <a href="https://github.com/nickderobertis/multivenv" title="Go to repository" class="md-source" data-md-source="github">
@@ -284,6 +284,21 @@
 
 <div class="viewcode-block" id="CompiledRequirementsNotFoundException"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.exc.CompiledRequirementsNotFoundException">[docs]</a><span class="k">class</span> <span class="nc">CompiledRequirementsNotFoundException</span><span class="p">(</span><span class="n">RequirementsFileException</span><span class="p">):</span>
     <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="MultivenvCommandException"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.exc.MultivenvCommandException">[docs]</a><span class="k">class</span> <span class="nc">MultivenvCommandException</span><span class="p">(</span><span class="n">MultivenvException</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="CommandExitException"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.exc.CommandExitException">[docs]</a><span class="k">class</span> <span class="nc">CommandExitException</span><span class="p">(</span><span class="n">MultivenvCommandException</span><span class="p">):</span>
+<div class="viewcode-block" id="CommandExitException.__init__"><a class="viewcode-back" href="../../api/multivenv.html#multivenv.exc.CommandExitException.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exit_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exit_code</span> <span class="o">=</span> <span class="n">exit_code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">output</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Command '</span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s2">' exited with code </span><span class="si">{</span><span class="n">exit_code</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"Command '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="si">}</span><span class="s2">' exited with code </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exit_code</span><span class="si">}</span><span class="s2">. Output:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="si">}</span><span class="s2">"</span></div>
 </pre></div>
 
           </article>

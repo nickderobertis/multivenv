@@ -47,7 +47,7 @@
   
   
   
-    <title>multivenv package &#8212; multivenv 1.0.0a18 documentation</title>
+    <title>multivenv package &#8212; multivenv 1.0.0a19 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
@@ -90,7 +90,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../index.html" title="multivenv 1.0.0a18 documentation"
+        <a href="../index.html" title="multivenv 1.0.0a19 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe869</i>
@@ -176,7 +176,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">multivenv 1.0.0a18 documentation</a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">multivenv 1.0.0a19 documentation</a></li>
           <li class="md-tabs__item"><a href="modules.html" class="md-tabs__link">multivenv</a></li>
       </ul>
     </div>
@@ -189,13 +189,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../index.html" title="multivenv 1.0.0a18 documentation" class="md-nav__button md-logo">
+    <a href="../index.html" title="multivenv 1.0.0a19 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe869</i>
       
     </a>
     <a href="../index.html"
-       title="multivenv 1.0.0a18 documentation">multivenv</a>
+       title="multivenv 1.0.0a19 documentation">multivenv</a>
   </label>
     <div class="md-nav__source">
       <a href="https://github.com/nickderobertis/multivenv" title="Go to repository" class="md-source" data-md-source="github">
@@ -324,9 +324,23 @@
 <section id="module-multivenv.exc">
 <span id="multivenv-exc-module"></span><h2 id="module-multivenv.exc">multivenv.exc module<a class="headerlink" href="#module-multivenv.exc" title="Permalink to this heading">¶</a></h2>
 <dl class="py exception">
+<dt class="sig sig-object py" id="multivenv.exc.CommandExitException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.exc.</span></span><span class="sig-name descname"><span class="pre">CommandExitException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exit_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multivenv/exc.html#CommandExitException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.CommandExitException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#multivenv.exc.MultivenvCommandException" title="multivenv.exc.MultivenvCommandException"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultivenvCommandException</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="multivenv.exc.CommandExitException.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exit_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multivenv/exc.html#CommandExitException.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.CommandExitException.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="multivenv.exc.CompiledRequirementsNotFoundException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.exc.</span></span><span class="sig-name descname"><span class="pre">CompiledRequirementsNotFoundException</span></span><a class="reference internal" href="../_modules/multivenv/exc.html#CompiledRequirementsNotFoundException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.CompiledRequirementsNotFoundException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#multivenv.exc.RequirementsFileException" title="multivenv.exc.RequirementsFileException"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequirementsFileException</span></code></a></p>
+</dd></dl>
+<dl class="py exception">
+<dt class="sig sig-object py" id="multivenv.exc.MultivenvCommandException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.exc.</span></span><span class="sig-name descname"><span class="pre">MultivenvCommandException</span></span><a class="reference internal" href="../_modules/multivenv/exc.html#MultivenvCommandException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.MultivenvCommandException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#multivenv.exc.MultivenvException" title="multivenv.exc.MultivenvException"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultivenvException</span></code></a></p>
 </dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="multivenv.exc.MultivenvConfigException">
