@@ -6,6 +6,7 @@ from typing import Mapping, NamedTuple, Optional
 from pydantic import BaseModel
 
 from multivenv._styles import printer
+from multivenv.exc import CommandExitException
 
 
 class CLIResult(BaseModel):
@@ -57,7 +58,7 @@ def run(
         buffer += c
     process.wait()
     if check and process.returncode != 0:
-        raise subprocess.CalledProcessError(process.returncode, command)
+        raise CommandExitException(process.returncode, command, buffer.decode())
 
     return CLIResult(
         output=buffer.decode(),
