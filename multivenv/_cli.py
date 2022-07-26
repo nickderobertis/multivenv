@@ -174,7 +174,12 @@ def run(
     venv_config = venv_configs[0]
 
     if auto_sync and venv_needs_sync(venv_config):
-        sync_venv(venv_config)
+        _loop_sequential_progress(
+            [venv_config],
+            sync_venv,
+            lambda v: f"Syncing {v.name}",
+            lambda v: f"Synced {v.name}",
+        )
 
     full_command = " ".join(command)
     result = run_in_venv(venv_config, full_command, errors=errors)
@@ -202,7 +207,12 @@ def run_all(
         # TODO: add progress bar for run all. Need to create two separate sections in a live display
         print(f"Running command in {venv_config.name}")
         if auto_sync and venv_needs_sync(venv_config):
-            sync_venv(venv_config)
+            _loop_sequential_progress(
+                [venv_config],
+                sync_venv,
+                lambda v: f"Syncing {v.name}",
+                lambda v: f"Synced {v.name}",
+            )
         result = run_in_venv(venv_config, full_command, errors=errors)
         if errors == ErrorHandling.PROPAGATE and result.exit_code != 0:
             exit(result.exit_code)
