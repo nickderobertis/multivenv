@@ -19,6 +19,7 @@ from tests.config import (
     BASIC_CONFIG_PATH,
     BASIC_REQUIREMENTS_HASH,
     BASIC_STATE_CONFIG_PATH,
+    EPHEMERAL_CONFIG_PATH,
     REQUIREMENTS_IN_PATH,
     REQUIREMENTS_MULTIPLATFORM_CONFIG_PATH,
     REQUIREMENTS_OUT_PATH,
@@ -67,9 +68,19 @@ def test_sync_cli(temp_dir: Path):
             requirements_out=temp_dir / "requirements.txt",
             versions=[],
             platforms=[],
+            persistent=True,
         )
         run_cli("sync")
         assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+
+
+def test_sync_ephemeral(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(EPHEMERAL_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        result = run_cli("sync")
+        assert "No persistent venvs found" in result.stdout
 
 
 def test_update_cli(temp_dir: Path):
@@ -87,6 +98,7 @@ def test_update_cli(temp_dir: Path):
             requirements_out=temp_dir / "requirements.txt",
             versions=[],
             platforms=[],
+            persistent=True,
         )
         assert not expect_requirements_out_path.exists()
         run_cli("update")
@@ -119,6 +131,7 @@ def test_update_multiplatform_cli(temp_dir: Path):
             requirements_out=temp_dir / "requirements.txt",
             versions=[],
             platforms=[],
+            persistent=True,
         )
         for path in expect_requirements_out_paths:
             assert not path.exists()
@@ -126,6 +139,16 @@ def test_update_multiplatform_cli(temp_dir: Path):
         for path in expect_requirements_out_paths:
             assert path.exists()
         assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+
+
+def test_update_ephemeral(temp_dir: Path):
+    expect_requirements_out_path = temp_dir / "requirements.txt"
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(EPHEMERAL_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        assert not expect_requirements_out_path.exists()
+        run_cli("update")
+        assert expect_requirements_out_path.exists()
 
 
 def test_run_cli(temp_dir: Path):
@@ -154,6 +177,15 @@ def test_run_cli_no_auto_sync(temp_dir: Path):
     with change_directory_to(temp_dir):
         output = run_cli("run basic pip freeze --no-auto-sync")
         assert is_not_found_output(output.stdout)
+
+
+def test_run_ephemeral(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(EPHEMERAL_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        output = run_cli("run basic pip freeze")
+        assert "appdirs==1.4.4" in output.stdout
 
 
 def test_run_cli_error_propagate(temp_dir: Path):
@@ -201,6 +233,15 @@ def test_run_all_cli(temp_dir: Path):
     shutil.copy(BASIC_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
         run_cli("sync")
+        output = run_cli("run-all pip freeze")
+        assert "appdirs==1.4.4" in output.stdout
+
+
+def test_run_all_ephemeral(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(EPHEMERAL_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
         output = run_cli("run-all pip freeze")
         assert "appdirs==1.4.4" in output.stdout
 
@@ -268,3 +309,21 @@ def test_delete_cli(temp_dir: Path):
         assert venv_folder.exists()
         run_cli("delete")
         assert not venv_folder.exists()
+
+
+def test_delete_ephemeral(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(EPHEMERAL_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        result = run_cli("delete")
+        assert "No existing venvs found matching the given criteria" in result.stdout
+
+
+def test_delete_non_synced(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        result = run_cli("delete")
+        assert "No existing venvs found matching the given criteria" in result.stdout

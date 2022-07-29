@@ -36,6 +36,12 @@ NO_AUTO_SYNC_OPTION = typer.Option(
     "--no-auto-sync",
     help="Don't sync the venv before running the command",
 )
+PERSISTENT_OPTION = typer.Option(
+    None,
+    "--persistent",
+    is_flag=True,
+    help="Keep the venv after the command has finished",
+)
 PLATFORMS_OPTION = typer.Option(
     None,
     "-p",
@@ -89,8 +95,14 @@ def sync(
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
+    should_sync_venv_configs = [
+        venv_config for venv_config in venv_configs if venv_config.persistent
+    ]
+    if not should_sync_venv_configs:
+        printer.alert("No persistent venvs found")
+        return
     return _loop_sequential_progress(
-        venv_configs,
+        should_sync_venv_configs,
         sync_venv,
         lambda v: f"Syncing {v.name}",
         lambda v: f"Synced {v.name}",
@@ -140,7 +152,8 @@ def update(
 
     def compile_and_sync(venv_config: VenvConfig):
         compile_venv_requirements(venv_config)
-        sync_venv(venv_config)
+        if venv_config.persistent:
+            sync_venv(venv_config)
 
     return _loop_sequential_progress(
         venv_configs,
@@ -162,18 +175,21 @@ def run(
     errors: ErrorHandling = ERROR_HANDLING_OPTION,
     quiet: bool = QUIET_OPTION,
     no_auto_sync: bool = NO_AUTO_SYNC_OPTION,
+    persistent: bool = PERSISTENT_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
-    venv_configs = _create_internal_venv_configs(venvs, [venv_name], venv_folder)
+    venv_configs = _create_internal_venv_configs(
+        venvs, [venv_name], venv_folder, persistent=persistent
+    )
     auto_sync = not no_auto_sync
     if len(venv_configs) == 0:
         raise NoSuchVenvException(f"Could not find {venv_name} in {venvs}")
     assert len(venv_configs) == 1
     venv_config = venv_configs[0]
 
-    if auto_sync and venv_needs_sync(venv_config):
+    if not venv_config.persistent or (auto_sync and venv_needs_sync(venv_config)):
         _loop_sequential_progress(
             [venv_config],
             sync_venv,
@@ -183,6 +199,8 @@ def run(
 
     full_command = " ".join(command)
     result = run_in_venv(venv_config, full_command, errors=errors)
+    if not venv_config.persistent:
+        delete_venv(venv_config, ignore_errors=True)
     if errors == ErrorHandling.PROPAGATE:
         exit(result.exit_code)
 
@@ -196,24 +214,29 @@ def run_all(
     errors: ErrorHandling = ERROR_HANDLING_OPTION,
     quiet: bool = QUIET_OPTION,
     no_auto_sync: bool = NO_AUTO_SYNC_OPTION,
+    persistent: bool = PERSISTENT_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
-    venv_configs = _create_internal_venv_configs(venvs, None, venv_folder)
+    venv_configs = _create_internal_venv_configs(
+        venvs, None, venv_folder, persistent=persistent
+    )
     auto_sync = not no_auto_sync
     full_command = " ".join(command)
     for venv_config in venv_configs:
-        # TODO: add progress bar for run all. Need to create two separate sections in a live display
-        print(f"Running command in {venv_config.name}")
-        if auto_sync and venv_needs_sync(venv_config):
+        if not venv_config.persistent or (auto_sync and venv_needs_sync(venv_config)):
             _loop_sequential_progress(
                 [venv_config],
                 sync_venv,
                 lambda v: f"Syncing {v.name}",
                 lambda v: f"Synced {v.name}",
             )
+        print(f"Running command in {venv_config.name}")
+        # TODO: add progress bar for run all. Need to create two separate sections in a live display
         result = run_in_venv(venv_config, full_command, errors=errors)
+        if not venv_config.persistent:
+            delete_venv(venv_config, ignore_errors=True)
         if errors == ErrorHandling.PROPAGATE and result.exit_code != 0:
             exit(result.exit_code)
 
@@ -266,6 +289,14 @@ def delete(
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
+    should_delete_venv_configs = [
+        venv_config
+        for venv_config in venv_configs
+        if venv_config.persistent and venv_config.path.exists()
+    ]
+    if not should_delete_venv_configs:
+        printer.alert("No existing venvs found matching the given criteria")
+        return
     return _loop_sequential_progress(
         venv_configs,
         delete_venv,
@@ -280,6 +311,7 @@ def _create_internal_venv_configs(
     venv_folder: Path,
     versions: Optional[List[str]] = None,
     platforms: Optional[List[str]] = None,
+    persistent: Optional[bool] = None,
 ):
     if not venvs:
         raise MutlivenvConfigVenvsNotDefinedException(
@@ -293,6 +325,7 @@ def _create_internal_venv_configs(
             venv_folder / name,
             global_versions=versions,
             global_platforms=platforms,
+            global_persistent=persistent,
         )
         for name, venv_config in venvs.items()
         if name in venv_names
