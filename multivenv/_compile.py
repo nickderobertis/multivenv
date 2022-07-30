@@ -31,7 +31,9 @@ def pip_tools_compile(
     platform: Optional[str] = None,
 ) -> CLIResult:
     env = {"CUSTOM_COMPILE_COMMAND": "mvenv compile"}
-    base_command = f"pip-compile {requirements_in} -o {requirements_out}"
+    base_command = (
+        f"pip-compile --generate-hashes {requirements_in} -o {requirements_out}"
+    )
     if platform or version:
         pip_args = []
         if platform:
