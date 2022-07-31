@@ -2,9 +2,10 @@ venv_folder: venvs
 venv_names: null
 venvs:
   basic:
-versions:
-  - 3.7
-  - "3.10"
-platforms:
-  - linux-x86_64
-  - win32
+targets:
+  versions:
+    - 3.7
+    - "3.10"
+  platforms:
+    - linux
+    - windows

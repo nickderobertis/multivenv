@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from multivenv._config import VenvConfig, VenvUserConfig
+from multivenv._config import TargetsUserConfig, VenvConfig, VenvUserConfig
 from tests.config import (
     REQUIREMENTS_IN_PATH,
     REQUIREMENTS_MULTIPLATFORM_OUT_PATH,
@@ -35,12 +35,14 @@ def multiplatform_venv_config(temp_dir: Path) -> VenvConfig:
     requirements_in_path = temp_dir / "requirements.in"
     shutil.copy(REQUIREMENTS_IN_PATH, requirements_in_path)
     venv_path = temp_dir / "venvs" / name
+    targets = TargetsUserConfig(
+        platforms=["linux", "windows"], versions=["3.7", "3.10"]
+    )
     yield VenvConfig.from_user_config(
         VenvUserConfig(requirements_in=requirements_in_path),
         name,
         venv_path,
-        global_platforms=["linux_x86_64", "win32"],
-        global_versions=["3.7", "3.10"],
+        global_targets=targets,
     )
 
 

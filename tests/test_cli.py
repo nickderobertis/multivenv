@@ -25,6 +25,7 @@ from tests.config import (
     REQUIREMENTS_OUT_PATH,
 )
 from tests.dirutils import change_directory_to
+from tests.fixtures.targets import linux_310_environment
 from tests.fixtures.temp_dir import *
 from tests.osutils import is_not_found_output
 from tests.venvutils import get_installed_packages_in_venv
@@ -66,8 +67,7 @@ def test_sync_cli(temp_dir: Path):
             path=venv_folder,
             requirements_in=temp_dir / "requirements.in",
             requirements_out=temp_dir / "requirements.txt",
-            versions=[],
-            platforms=[],
+            targets=[],
             persistent=True,
         )
         run_cli("sync")
@@ -96,8 +96,7 @@ def test_update_cli(temp_dir: Path):
             path=venv_folder,
             requirements_in=temp_dir / "requirements.in",
             requirements_out=temp_dir / "requirements.txt",
-            versions=[],
-            platforms=[],
+            targets=[],
             persistent=True,
         )
         assert not expect_requirements_out_path.exists()
@@ -106,17 +105,15 @@ def test_update_cli(temp_dir: Path):
         assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
 
 
-@patch.object(sys, "version_info", (3, 7, 0, "final", 0))
-@patch.object(_platform, "get_platform", lambda: "linux_x86_64")
-def test_update_multiplatform_cli(temp_dir: Path):
+def test_update_multiplatform_cli(temp_dir: Path, linux_310_environment):
     venv_name = "basic"
     venvs_folder = temp_dir / "venvs"
     venv_folder = venvs_folder / venv_name
     expect_requirements_out_names = [
-        "requirements-3.7-linux_x86_64.txt",
-        "requirements-3.7-win32.txt",
-        "requirements-3.10-linux_x86_64.txt",
-        "requirements-3.10-win32.txt",
+        "requirements-3.7.0-linux-Linux-x86_64.txt",
+        "requirements-3.7.0-win32-Windows-x86_64.txt",
+        "requirements-3.10.0-linux-Linux-x86_64.txt",
+        "requirements-3.10.0-win32-Windows-x86_64.txt",
     ]
     expect_requirements_out_paths = [
         temp_dir / name for name in expect_requirements_out_names
@@ -129,8 +126,7 @@ def test_update_multiplatform_cli(temp_dir: Path):
             path=venv_folder,
             requirements_in=temp_dir / "requirements.in",
             requirements_out=temp_dir / "requirements.txt",
-            versions=[],
-            platforms=[],
+            targets=[],
             persistent=True,
         )
         for path in expect_requirements_out_paths:

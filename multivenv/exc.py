@@ -14,6 +14,10 @@ class NoSuchVenvException(MultivenvConfigException):
     pass
 
 
+class NoSuchPlatformStringException(MultivenvConfigException):
+    pass
+
+
 class RequirementsFileException(MultivenvException):
     pass
 

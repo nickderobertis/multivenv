@@ -1,25 +1,22 @@
 from pathlib import Path
 
 from multivenv import _platform
-from multivenv._config import VenvConfig
+from multivenv._config import TargetConfig, VenvConfig
 from multivenv.exc import CompiledRequirementsNotFoundException
 
 
 # TODO: Add options to make requirement finding for sync more flexible (strict versus loose)
 def find_requirements_file(config: VenvConfig) -> Path:
-    current_python_version = _platform.get_python_version()
-    current_platform = _platform.get_platform()
-    exact_path = config.requirements_out_path_for(
-        current_python_version, current_platform
-    )
+    current_target = TargetConfig.from_system()
+    exact_path = config.requirements_out_path_for(current_target)
     if exact_path.exists():
         return exact_path
 
     # Try matching only on one of version or platform
-    platform_path = config.requirements_out_path_for(None, current_platform)
+    platform_path = config.requirements_out_path_for(current_target.without_version())
     if platform_path.exists():
         return platform_path
-    version_path = config.requirements_out_path_for(current_python_version, None)
+    version_path = config.requirements_out_path_for(current_target.without_platform())
     if version_path.exists():
         return version_path
 

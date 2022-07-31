@@ -6,7 +6,7 @@ import typer
 from rich.progress import Progress
 
 from multivenv._compile import compile_venv_requirements
-from multivenv._config import VenvConfig, VenvUserConfig
+from multivenv._config import TargetsUserConfig, VenvConfig, VenvUserConfig
 from multivenv._delete import delete_venv
 from multivenv._info import AllInfo, InfoFormat, create_venv_info
 from multivenv._run import ErrorHandling, run_in_venv
@@ -42,25 +42,18 @@ PERSISTENT_OPTION = typer.Option(
     is_flag=True,
     help="Keep the venv after the command has finished",
 )
-PLATFORMS_OPTION = typer.Option(
-    None,
-    "-p",
-    "--platform",
-    help="Platform (OS) to compile for. Defaults to the current platform",
-    show_default=False,
-)
-PYTHON_VERSIONS_OPTION = typer.Option(
-    None,
-    "-v",
-    "--version",
-    help="Python versions to compile for. Defaults to the current python version",
-    show_default=False,
-)
 QUIET_OPTION = typer.Option(
     False,
     "-q",
     "--quiet",
     help="Don't print anything to the console",
+    show_default=False,
+)
+TARGETS_OPTION = typer.Option(
+    None,
+    "-t",
+    "--target",
+    help="Targets to compile for. Defaults to the current platform and python version.",
     show_default=False,
 )
 VENV_NAMES_ARG = typer.Argument(
@@ -115,15 +108,17 @@ def compile(
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
-    versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
-    platforms: Optional[List[str]] = PLATFORMS_OPTION,
+    targets: Optional[TargetsUserConfig] = TARGETS_OPTION,
     quiet: bool = QUIET_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(
-        venvs, venv_names, venv_folder, versions=versions, platforms=platforms
+        venvs,
+        venv_names,
+        venv_folder,
+        targets=targets,
     )
     return _loop_sequential_progress(
         venv_configs,
@@ -139,15 +134,17 @@ def update(
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
-    versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
-    platforms: Optional[List[str]] = PLATFORMS_OPTION,
+    targets: Optional[TargetsUserConfig] = TARGETS_OPTION,
     quiet: bool = QUIET_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(
-        venvs, venv_names, venv_folder, versions=versions, platforms=platforms
+        venvs,
+        venv_names,
+        venv_folder,
+        targets=targets,
     )
 
     def compile_and_sync(venv_config: VenvConfig):
@@ -254,15 +251,17 @@ def info(
     ),
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
-    versions: Optional[List[str]] = PYTHON_VERSIONS_OPTION,
-    platforms: Optional[List[str]] = PLATFORMS_OPTION,
+    targets: Optional[TargetsUserConfig] = TARGETS_OPTION,
     quiet: bool = QUIET_OPTION,
 ) -> AllInfo:
     if quiet:
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(
-        venvs, venv_names, venv_folder, versions=versions, platforms=platforms
+        venvs,
+        venv_names,
+        venv_folder,
+        targets=targets,
     )
     all_info = AllInfo(
         venv_info=[create_venv_info(venv_config) for venv_config in venv_configs]
@@ -309,8 +308,7 @@ def _create_internal_venv_configs(
     venvs: Optional[Venvs],
     venv_names: Optional[List[str]],
     venv_folder: Path,
-    versions: Optional[List[str]] = None,
-    platforms: Optional[List[str]] = None,
+    targets: Optional[TargetsUserConfig] = None,
     persistent: Optional[bool] = None,
 ):
     if not venvs:
@@ -323,8 +321,7 @@ def _create_internal_venv_configs(
             venv_config,
             name,
             venv_folder / name,
-            global_versions=versions,
-            global_platforms=platforms,
+            global_targets=targets,
             global_persistent=persistent,
         )
         for name, venv_config in venvs.items()
