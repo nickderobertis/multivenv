@@ -1,7 +1,7 @@
 import shutil
 
 from multivenv import _platform
-from multivenv._config import VenvConfig
+from multivenv._config import TargetConfig, VenvConfig
 from multivenv._info import SystemInfo, create_venv_info
 from multivenv._state import create_venv_state, update_venv_state
 from tests.config import BASIC_REQUIREMENTS_HASH
@@ -32,6 +32,6 @@ def test_info(venv_config: VenvConfig):
 
 def test_system_info():
     info = SystemInfo.from_system()
-    assert info.python_version == _platform.get_python_version()
-    assert info.platform == _platform.get_platform()
-    assert info.file_extension == "-".join([info.python_version, info.platform])
+    current_target = TargetConfig.from_system()
+    assert info.version == current_target.version
+    assert info.platform == current_target.platform
