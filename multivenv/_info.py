@@ -5,8 +5,12 @@ from typing import Iterator, List, Optional
 
 from pydantic import BaseModel, Field
 
-from multivenv import _platform
-from multivenv._config import VenvConfig
+from multivenv._config import (
+    PlatformConfig,
+    PythonVersionConfig,
+    TargetConfig,
+    VenvConfig,
+)
 from multivenv._find_reqs import find_requirements_file
 from multivenv._state import VenvState
 from multivenv.exc import CompiledRequirementsNotFoundException
@@ -23,19 +27,15 @@ class RequirementsInfo(BaseModel):
 
 
 class SystemInfo(BaseModel):
-    python_version: str
-    platform: str
-    file_extension: str
+    version: PythonVersionConfig
+    platform: PlatformConfig
 
     @classmethod
     def from_system(cls) -> "SystemInfo":
-        python_version = _platform.get_python_version()
-        platform = _platform.get_platform()
-        file_extension = "-".join([python_version, platform])
+        current_target = TargetConfig.from_system()
         return cls(
-            python_version=python_version,
-            platform=platform,
-            file_extension=file_extension,
+            version=current_target.version,
+            platform=current_target.platform,
         )
 
 

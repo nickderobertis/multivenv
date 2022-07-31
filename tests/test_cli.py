@@ -269,7 +269,7 @@ def test_info_json(temp_dir: Path):
         assert info["discovered_requirements"]["in_path"] == "requirements.in"
         assert info["discovered_requirements"]["out_path"] == None
         assert info["exists"] is False
-        assert "3." in data["system"]["python_version"]
+        assert data["system"]["version"]["version"]["major"] == 3
         assert info["state"]["needs_sync"] is True
         assert info["state"]["requirements_hash"] is None
 

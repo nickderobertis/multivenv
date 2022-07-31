@@ -3,6 +3,7 @@ from pathlib import Path
 
 import multivenv
 from multivenv import _platform
+from multivenv._config import TargetConfig
 from tests.config import (
     BASIC_REQUIREMENTS_HASH,
     REQUIREMENTS_IN_PATH,
@@ -20,8 +21,9 @@ def test_info(temp_dir: Path):
         multivenv.sync(venvs=venvs)
         all_info = multivenv.info(["basic"], venvs=venvs)
         assert len(all_info) == 1
-        assert all_info.system.python_version == _platform.get_python_version()
-        assert all_info.system.platform == _platform.get_platform()
+        current_target = TargetConfig.from_system()
+        assert all_info.system.version == current_target.version
+        assert all_info.system.platform == current_target.platform
         info = all_info[0]
         assert info.name == "basic"
         assert info.path == Path("venvs", "basic")
