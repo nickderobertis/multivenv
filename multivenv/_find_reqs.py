@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from multivenv import _platform
 from multivenv._config import TargetConfig, VenvConfig
 from multivenv.exc import CompiledRequirementsNotFoundException
 

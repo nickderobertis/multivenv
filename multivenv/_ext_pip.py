@@ -1,14 +1,14 @@
 import contextlib
-from typing import Dict, Optional
-
-from packaging import version
+from typing import Generator, Optional
 
 from multivenv._config import PlatformConfig, PythonVersionConfig, TargetConfig
 from multivenv._ext_packaging import Environment
 
 
 @contextlib.contextmanager
-def monkey_patch_pip_packaging_markers_to_target(target: TargetConfig) -> None:
+def monkey_patch_pip_packaging_markers_to_target(
+    target: TargetConfig,
+) -> Generator[None, None, None]:
     """
     Monkey patch ``pip._vendor.packaging.markers.Marker`` to use the given platform and python version.
 
@@ -20,7 +20,8 @@ def monkey_patch_pip_packaging_markers_to_target(target: TargetConfig) -> None:
     orig_evaluate = pip._vendor.packaging.markers.Marker.evaluate
 
     def evaluate(
-        self: pip._vendor.packaging.markers.Marker, environment: Environment = None
+        self: pip._vendor.packaging.markers.Marker,
+        environment: Optional[Environment] = None,
     ) -> bool:
         """
         This is a modified version of the original evaluate function.
@@ -47,11 +48,11 @@ def monkey_patch_pip_packaging_markers_to_target(target: TargetConfig) -> None:
             self._markers, with_platform_env
         )
 
-    pip._vendor.packaging.markers.Marker.evaluate = evaluate
+    pip._vendor.packaging.markers.Marker.evaluate = evaluate  # type: ignore
 
     yield
 
-    pip._vendor.packaging.markers.Marker.evaluate = orig_evaluate
+    pip._vendor.packaging.markers.Marker.evaluate = orig_evaluate  # type: ignore
 
 
 def _with_updated_python_version_environment(

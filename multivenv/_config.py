@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 from multivenv import _ext_packaging
 from multivenv._dirutils import create_temp_path
-from multivenv._platform import platform_to_pypi_tag
 from multivenv.exc import NoSuchPlatformStringException
 
 PlatformString = Literal["linux", "macos", "windows"]
@@ -235,8 +234,8 @@ class TargetsConfig(BaseModel):
     @classmethod
     def from_user_config(cls, user_config: TargetsUserConfig) -> "TargetsConfig":
         targets = _resolve_target_config(
-            versions=user_config.versions,
-            platforms=user_config.platforms,
+            versions=user_config.versions or [],
+            platforms=user_config.platforms or [],
             targets=user_config.targets,
             extend_targets=user_config.extend_targets,
             skip_targets=user_config.skip_targets,
@@ -359,5 +358,5 @@ def _resolve_target_config(
         out_targets.extend(TargetConfig.from_user_config(t) for t in extend_targets)
     if skip_targets is not None:
         compare_skip_targets = [TargetConfig.from_user_config(t) for t in skip_targets]
-        return [t for t in targets if t not in compare_skip_targets]
+        return [t for t in compare_skip_targets if t not in compare_skip_targets]
     return out_targets
