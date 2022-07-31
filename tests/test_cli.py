@@ -286,7 +286,7 @@ def test_info_with_venv(temp_dir: Path):
         assert "requirements.txt" in output.stdout
         assert "requirements.in" in output.stdout
         assert "exists=True" in output.stdout
-        assert "3." in output.stdout
+        assert "3" in output.stdout
         assert BASIC_REQUIREMENTS_HASH in output.stdout
 
 
