@@ -111,9 +111,9 @@ def test_update_multiplatform_cli(temp_dir: Path, linux_310_environment):
     venv_folder = venvs_folder / venv_name
     expect_requirements_out_names = [
         "requirements-3.7.0-linux-Linux-x86_64.txt",
-        "requirements-3.7.0-win32-Windows-x86_64.txt",
+        "requirements-3.7.0-win32-Windows-AMD64.txt",
         "requirements-3.10.0-linux-Linux-x86_64.txt",
-        "requirements-3.10.0-win32-Windows-x86_64.txt",
+        "requirements-3.10.0-win32-Windows-AMD64.txt",
     ]
     expect_requirements_out_paths = [
         temp_dir / name for name in expect_requirements_out_names
