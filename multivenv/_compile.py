@@ -9,7 +9,6 @@ from piptools.scripts.compile import cli as compile_click_command
 from multivenv._config import TargetConfig, VenvConfig
 from multivenv._env import with_pip_tools_custom_compile_command_as_mvenv_compile
 from multivenv._ext_pip import monkey_patch_pip_packaging_markers_to_target
-from multivenv._ext_subprocess import CLIResult, run
 
 
 def compile_venv_requirements(config: VenvConfig):

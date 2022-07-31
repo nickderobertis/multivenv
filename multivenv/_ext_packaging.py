@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict
 
 from packaging.markers import default_environment
 
