@@ -10,7 +10,7 @@ def windows_37_environment() -> _ext_packaging.Environment:
     windows_env: _ext_packaging.Environment = dict(
         os_name="nt",
         sys_platform="win32",
-        platform_machine="x86_64",
+        platform_machine="AMD64",
         platform_python_implementation="CPython",
         platform_system="Windows",
         python_version="3.7",
