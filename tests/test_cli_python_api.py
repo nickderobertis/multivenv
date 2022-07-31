@@ -24,6 +24,10 @@ def test_info(temp_dir: Path):
         current_target = TargetConfig.from_system()
         assert all_info.system.version == current_target.version
         assert all_info.system.platform == current_target.platform
+        assert (
+            all_info.system.file_extension
+            == current_target.requirements_out_file_extension
+        )
         info = all_info[0]
         assert info.name == "basic"
         assert info.path == Path("venvs", "basic")

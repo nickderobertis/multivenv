@@ -29,6 +29,7 @@ class RequirementsInfo(BaseModel):
 class SystemInfo(BaseModel):
     version: PythonVersionConfig
     platform: PlatformConfig
+    file_extension: str
 
     @classmethod
     def from_system(cls) -> "SystemInfo":
@@ -36,6 +37,7 @@ class SystemInfo(BaseModel):
         return cls(
             version=current_target.version,
             platform=current_target.platform,
+            file_extension=current_target.requirements_out_file_extension,
         )
 
 

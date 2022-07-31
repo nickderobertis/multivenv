@@ -213,6 +213,15 @@ class TargetConfig(BaseModel):
     def without_platform(self) -> "TargetConfig":
         return self.copy(update=dict(platform=None))
 
+    @property
+    def requirements_out_file_extension(self) -> str:
+        suffix = ""
+        if self.version:
+            suffix += f"-{self.version.version}"
+        if self.platform:
+            suffix += f"-{self.platform}"
+        return suffix
+
 
 class TargetsUserConfig(BaseModel):
     versions: Optional[List[UserPythonVersionConfig]] = None
@@ -294,11 +303,7 @@ class VenvConfig(BaseModel):
         self,
         target: TargetConfig,
     ) -> Path:
-        suffix = ""
-        if target.version:
-            suffix += f"-{target.version.version}"
-        if target.platform:
-            suffix += f"-{target.platform}"
+        suffix = target.requirements_out_file_extension
         suffix += ".txt"
         name = self.requirements_out.with_suffix("").name + suffix
         return self.requirements_out.parent / name
