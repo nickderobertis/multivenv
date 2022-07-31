@@ -75,7 +75,7 @@ class PlatformConfig(BaseModel):
             )
         elif platform == "macos":
             user_config = PlatformUserConfig(
-                sys_platform="macos",
+                sys_platform="darwin",
                 os_name="posix",
                 platform_system="Darwin",
             )
@@ -84,6 +84,7 @@ class PlatformConfig(BaseModel):
                 sys_platform="win32",
                 os_name="nt",
                 platform_system="Windows",
+                platform_machine="AMD64",
             )
         else:
             raise NoSuchPlatformStringException(
