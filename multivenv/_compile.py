@@ -21,7 +21,7 @@ def compile_venv_requirements(config: VenvConfig):
     for target in config.targets:
         pip_tools_compile(
             config.requirements_in,
-            config.requirements_out_path_for(target),
+            config.default_requirements_out_path_for(target),
             target,
         )
 

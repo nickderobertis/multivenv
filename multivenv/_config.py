@@ -103,12 +103,13 @@ UserPythonVersionConfig = Union[PythonVersionUserConfig, str]
 
 # TODO: handling of version modifiers e.g alpha, beta, post, dev, etc.
 class Version(BaseModel):
+    full: str
     major: int
-    minor: int
-    micro: int
+    minor: Optional[int] = None
+    micro: Optional[int] = None
 
     def __str__(self) -> str:
-        return f"{self.major}.{self.minor}.{self.micro}"
+        return self.full
 
     @classmethod
     def from_str(cls, version: str) -> "Version":
@@ -118,10 +119,19 @@ class Version(BaseModel):
     @classmethod
     def from_packaging_version(cls, version: PackagingVersion) -> "Version":
         return cls(
+            full=str(version),
             major=version.major,
-            minor=version.minor,
-            micro=version.micro,
+            minor=version.minor if (version.minor or version.micro) else None,
+            micro=version.micro or None,
         )
+
+    def without_micro(self) -> "Version":
+        new_full = f"{self.major}.{self.minor}"
+        return self.copy(update=dict(micro=None, full=new_full))
+
+    def without_minor(self) -> "Version":
+        new_full = f"{self.major}"
+        return self.copy(update=dict(minor=None, micro=None, full=new_full))
 
 
 class PythonVersionConfig(BaseModel):
@@ -169,6 +179,14 @@ class PythonVersionConfig(BaseModel):
     def main_version(self) -> str:
         return f"{self.version.major}.{self.version.minor}"
 
+    def without_micro(self) -> "PythonVersionConfig":
+        new_version = self.version.without_micro()
+        return self.copy(update=dict(version=new_version))
+
+    def without_minor(self) -> "PythonVersionConfig":
+        new_version = self.version.without_minor()
+        return self.copy(update=dict(version=new_version))
+
 
 class TargetUserConfig(BaseModel):
     version: Optional[UserPythonVersionConfig] = None
@@ -214,6 +232,14 @@ class TargetConfig(BaseModel):
     def without_platform(self) -> "TargetConfig":
         return self.copy(update=dict(platform=None))
 
+    def without_micro(self) -> "TargetConfig":
+        new_version = self.version.without_micro() if self.version else None
+        return self.copy(update=dict(version=new_version))
+
+    def without_minor(self) -> "TargetConfig":
+        new_version = self.version.without_minor() if self.version else None
+        return self.copy(update=dict(version=new_version))
+
     @property
     def requirements_out_file_extension(self) -> str:
         suffix = ""
@@ -222,6 +248,22 @@ class TargetConfig(BaseModel):
         if self.platform:
             suffix += f"-{self.platform}"
         return suffix
+
+    @property
+    def requirements_out_possible_file_extensions(self) -> List[str]:
+        exts = [self.requirements_out_file_extension]
+
+        if self.version:
+            # Try matching with less-specific python versions
+            exts.append(self.without_micro().requirements_out_file_extension)
+            exts.append(self.without_minor().requirements_out_file_extension)
+            # Try matching without version
+            exts.append(self.without_version().requirements_out_file_extension)
+        if self.platform:
+            # Try matching without platform
+            exts.append(self.without_platform().requirements_out_file_extension)
+
+        return exts
 
 
 class TargetsUserConfig(BaseModel):
@@ -300,7 +342,7 @@ class VenvConfig(BaseModel):
             persistent=persistent,
         )
 
-    def requirements_out_path_for(
+    def default_requirements_out_path_for(
         self,
         target: TargetConfig,
     ) -> Path:
@@ -308,6 +350,15 @@ class VenvConfig(BaseModel):
         suffix += ".txt"
         name = self.requirements_out.with_suffix("").name + suffix
         return self.requirements_out.parent / name
+
+    def possible_requirements_out_paths_for(
+        self, target: TargetConfig
+    ) -> Iterator[Path]:
+        for ext in target.requirements_out_possible_file_extensions:
+            name = self.requirements_out.with_suffix("").name + ext + ".txt"
+            yield self.requirements_out.parent / name
+        # Go to default configured path (no version or platform extension)
+        yield self.requirements_out
 
 
 def _get_requirements_in_path(user_requirements_in: Optional[Path], name: str) -> Path:
