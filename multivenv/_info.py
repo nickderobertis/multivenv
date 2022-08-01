@@ -26,10 +26,27 @@ class RequirementsInfo(BaseModel):
     out_path: Optional[Path]
 
 
+class FileExtensions(BaseModel):
+    all: List[str]
+    default: str
+
+    @classmethod
+    def from_target(cls, target: TargetConfig) -> "FileExtensions":
+        return cls(
+            all=target.requirements_out_possible_file_extensions,
+            default=target.requirements_out_file_extension,
+        )
+
+    @classmethod
+    def from_system(cls) -> "FileExtensions":
+        target = TargetConfig.from_system()
+        return cls.from_target(target)
+
+
 class SystemInfo(BaseModel):
     version: PythonVersionConfig
     platform: PlatformConfig
-    file_extension: str
+    file_extensions: FileExtensions = Field(default_factory=FileExtensions.from_system)
 
     @classmethod
     def from_system(cls) -> "SystemInfo":
@@ -37,7 +54,6 @@ class SystemInfo(BaseModel):
         return cls(
             version=current_target.version,
             platform=current_target.platform,
-            file_extension=current_target.requirements_out_file_extension,
         )
 
 
@@ -70,6 +86,20 @@ class VenvStateInfo(BaseModel):
         return cls.from_venv_state(state, requirements_path)
 
 
+class TargetInfo(BaseModel):
+    version: PythonVersionConfig
+    platform: PlatformConfig
+    file_extensions: FileExtensions
+
+    @classmethod
+    def from_target(cls, target: TargetConfig) -> "TargetInfo":
+        return cls(
+            version=target.version,
+            platform=target.platform,
+            file_extensions=FileExtensions.from_target(target),
+        )
+
+
 class VenvInfo(BaseModel):
     name: str
     path: Path
@@ -77,6 +107,7 @@ class VenvInfo(BaseModel):
     config_requirements: RequirementsInfo
     discovered_requirements: RequirementsInfo
     state: VenvStateInfo
+    targets: List[TargetInfo]
 
 
 class AllInfo(BaseModel):
@@ -113,6 +144,7 @@ def create_venv_info(config: VenvConfig) -> VenvInfo:
     )
 
     state_info = VenvStateInfo.from_venv_config(config)
+    targets = [TargetInfo.from_target(target) for target in config.targets]
 
     return VenvInfo(
         name=config.name,
@@ -121,4 +153,5 @@ def create_venv_info(config: VenvConfig) -> VenvInfo:
         config_requirements=config_requirements,
         discovered_requirements=discovered_requirements,
         state=state_info,
+        targets=targets,
     )
