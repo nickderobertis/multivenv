@@ -7,18 +7,17 @@ from multivenv._run import ErrorHandling, run_in_venv
 from multivenv._state import update_venv_state
 
 
-def sync_venv(config: VenvConfig):
-    reqs_path = pip_tools_sync(config)
-    update_venv_state(config, reqs_path)
-
-
-def pip_tools_sync(config: VenvConfig) -> Path:
-    create_venv_if_not_exists(config)
+def sync_venv(config: VenvConfig, errors: ErrorHandling = ErrorHandling.RAISE):
+    create_venv_if_not_exists(config, errors=errors)
     requirements_file = find_requirements_file(config)
+    pip_tools_sync(config, requirements_file)
+    update_venv_state(config, requirements_file)
+
+
+def pip_tools_sync(config: VenvConfig, requirements_file: Path):
     run_in_venv(
         config,
         f"pip-sync {requirements_file}",
         stream=False,
         errors=ErrorHandling.RAISE,
     )
-    return requirements_file

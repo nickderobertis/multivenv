@@ -42,6 +42,12 @@ PERSISTENT_OPTION = typer.Option(
     is_flag=True,
     help="Keep the venv after the command has finished",
 )
+POST_CREATE_OPTION = typer.Option(
+    None,
+    "-p",
+    "--post-create",
+    help="Run this command after the venv has been created",
+)
 QUIET_OPTION = typer.Option(
     False,
     "-q",
@@ -61,7 +67,6 @@ VENV_NAMES_ARG = typer.Argument(
     help="Names of the virtual environments to work on. Defaults to all",
     show_default=False,
 )
-
 VENV_FOLDER_OPTION = typer.Option(
     Path("venvs"),
     "-f",
@@ -83,20 +88,25 @@ def sync(
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
     quiet: bool = QUIET_OPTION,
+    post_create: Optional[List[str]] = POST_CREATE_OPTION,
+    errors: ErrorHandling = ERROR_HANDLING_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
-    venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
+    venv_configs = _create_internal_venv_configs(
+        venvs, venv_names, venv_folder, post_create=post_create
+    )
     should_sync_venv_configs = [
         venv_config for venv_config in venv_configs if venv_config.persistent
     ]
     if not should_sync_venv_configs:
         printer.alert("No persistent venvs found")
         return
+
     return _loop_sequential_progress(
         should_sync_venv_configs,
-        sync_venv,
+        lambda v: sync_venv(v, errors=errors),
         lambda v: f"Syncing {v.name}",
         lambda v: f"Synced {v.name}",
     )
@@ -136,6 +146,8 @@ def update(
     venv_folder: Path = VENV_FOLDER_OPTION,
     targets: Optional[TargetsUserConfig] = TARGETS_OPTION,
     quiet: bool = QUIET_OPTION,
+    post_create: Optional[List[str]] = POST_CREATE_OPTION,
+    errors: ErrorHandling = ERROR_HANDLING_OPTION,
 ):
     if quiet:
         printer.make_quiet()
@@ -145,12 +157,13 @@ def update(
         venv_names,
         venv_folder,
         targets=targets,
+        post_create=post_create,
     )
 
     def compile_and_sync(venv_config: VenvConfig):
         compile_venv_requirements(venv_config)
         if venv_config.persistent:
-            sync_venv(venv_config)
+            sync_venv(venv_config, errors=errors)
 
     return _loop_sequential_progress(
         venv_configs,
@@ -173,12 +186,13 @@ def run(
     quiet: bool = QUIET_OPTION,
     no_auto_sync: bool = NO_AUTO_SYNC_OPTION,
     persistent: bool = PERSISTENT_OPTION,
+    post_create: Optional[List[str]] = POST_CREATE_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(
-        venvs, [venv_name], venv_folder, persistent=persistent
+        venvs, [venv_name], venv_folder, persistent=persistent, post_create=post_create
     )
     auto_sync = not no_auto_sync
     if len(venv_configs) == 0:
@@ -189,7 +203,7 @@ def run(
     if not venv_config.persistent or (auto_sync and venv_needs_sync(venv_config)):
         _loop_sequential_progress(
             [venv_config],
-            sync_venv,
+            lambda v: sync_venv(v, errors=errors),
             lambda v: f"Syncing {v.name}",
             lambda v: f"Synced {v.name}",
         )
@@ -212,12 +226,13 @@ def run_all(
     quiet: bool = QUIET_OPTION,
     no_auto_sync: bool = NO_AUTO_SYNC_OPTION,
     persistent: bool = PERSISTENT_OPTION,
+    post_create: Optional[List[str]] = POST_CREATE_OPTION,
 ):
     if quiet:
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(
-        venvs, None, venv_folder, persistent=persistent
+        venvs, None, venv_folder, persistent=persistent, post_create=post_create
     )
     auto_sync = not no_auto_sync
     full_command = " ".join(command)
@@ -225,7 +240,7 @@ def run_all(
         if not venv_config.persistent or (auto_sync and venv_needs_sync(venv_config)):
             _loop_sequential_progress(
                 [venv_config],
-                sync_venv,
+                lambda v: sync_venv(v, errors=errors),
                 lambda v: f"Syncing {v.name}",
                 lambda v: f"Synced {v.name}",
             )
@@ -310,6 +325,7 @@ def _create_internal_venv_configs(
     venv_folder: Path,
     targets: Optional[TargetsUserConfig] = None,
     persistent: Optional[bool] = None,
+    post_create: Optional[List[str]] = None,
 ):
     if not venvs:
         raise MutlivenvConfigVenvsNotDefinedException(
@@ -323,6 +339,7 @@ def _create_internal_venv_configs(
             venv_folder / name,
             global_targets=targets,
             global_persistent=persistent,
+            global_post_create=post_create,
         )
         for name, venv_config in venvs.items()
         if name in venv_names

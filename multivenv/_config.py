@@ -295,11 +295,15 @@ class TargetsConfig(BaseModel):
         return cls(targets=targets)
 
 
+UserRunConfig = Union[List[str], str]
+
+
 class VenvUserConfig(BaseModel):
     requirements_in: Optional[Path] = None
     requirements_out: Optional[Path] = None
     targets: Optional[TargetsUserConfig] = None
     persistent: bool = True
+    post_create: Optional[UserRunConfig] = None
 
 
 class VenvConfig(BaseModel):
@@ -309,6 +313,7 @@ class VenvConfig(BaseModel):
     requirements_out: Path
     targets: List[TargetConfig]
     persistent: bool
+    post_create: List[str]
 
     @classmethod
     def from_user_config(
@@ -318,6 +323,7 @@ class VenvConfig(BaseModel):
         path: Path,
         global_targets: Optional[TargetsUserConfig] = None,
         global_persistent: Optional[bool] = None,
+        global_post_create: Optional[UserRunConfig] = None,
     ):
         user_requirements_in = user_config.requirements_in if user_config else None
         user_requirements_out = user_config.requirements_out if user_config else None
@@ -327,6 +333,10 @@ class VenvConfig(BaseModel):
         targets = TargetsConfig.from_user_config(user_targets)
         persistent = _get_config_from_global_user_or_default(
             global_persistent, user_config, "persistent", True
+        )
+        default_post_create: UserRunConfig = []
+        post_create = _get_config_from_global_user_or_default(
+            global_post_create, user_config, "post_create", default_post_create
         )
         requirements_in = _get_requirements_in_path(user_requirements_in, name)
         requirements_out = user_requirements_out or requirements_in.with_suffix(".txt")
@@ -340,6 +350,7 @@ class VenvConfig(BaseModel):
             requirements_out=requirements_out,
             targets=targets.targets,
             persistent=persistent,
+            post_create=post_create,
         )
 
     def default_requirements_out_path_for(

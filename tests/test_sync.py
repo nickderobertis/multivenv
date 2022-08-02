@@ -61,3 +61,19 @@ def test_sync_on_wrong_platform_with_version_fallback(
     assert venv_config.path.exists()
     packages = get_installed_packages_in_venv(venv_config)
     assert "appdirs==1.4.4" in packages
+
+
+def test_post_create(compiled_venv_config: VenvConfig):
+    venv_config = compiled_venv_config
+    expect_path = (venv_config.path / "post_create.txt").resolve()
+    venv_config.post_create = [
+        f"""python -c 'from pathlib import Path;import sys;p = Path(sys.executable).parent.parent / "post_create.txt";p.touch()'"""
+    ]
+
+    assert not venv_config.path.exists()
+    assert not expect_path.exists()
+    sync_venv(venv_config)
+    assert venv_config.path.exists()
+    assert expect_path.exists()
+    packages = get_installed_packages_in_venv(venv_config)
+    assert "appdirs==1.4.4" in packages
