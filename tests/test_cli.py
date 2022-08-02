@@ -197,6 +197,46 @@ def test_update_ephemeral(temp_dir: Path):
         assert expect_requirements_out_path.exists()
 
 
+def test_update_cli_with_upgrade(temp_dir: Path):
+    venv_name = "basic"
+    venvs_folder = temp_dir / "venvs"
+    venv_folder = venvs_folder / venv_name
+    shutil.copy(UPGRADE_REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(UPGRADE_REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        config = VenvConfig.from_user_config(
+            VenvUserConfig(
+                requirements_in=temp_dir / "requirements.in",
+                requirements_out=temp_dir / "requirements.txt",
+            ),
+            name=venv_name,
+            path=venv_folder,
+        )
+        run_cli("update")
+        assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+
+
+def test_update_cli_with_no_upgrade(temp_dir: Path):
+    venv_name = "basic"
+    venvs_folder = temp_dir / "venvs"
+    venv_folder = venvs_folder / venv_name
+    shutil.copy(UPGRADE_REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(UPGRADE_REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        config = VenvConfig.from_user_config(
+            VenvUserConfig(
+                requirements_in=temp_dir / "requirements.in",
+                requirements_out=temp_dir / "requirements.txt",
+            ),
+            name=venv_name,
+            path=venv_folder,
+        )
+        run_cli("update --no-upgrade")
+        assert "appdirs==1.4.3" in get_installed_packages_in_venv(config)
+
+
 def test_run_cli(temp_dir: Path):
     shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
     shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)

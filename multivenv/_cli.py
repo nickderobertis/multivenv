@@ -161,6 +161,7 @@ def update(
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
     targets: Optional[TargetsUserConfig] = TARGETS_OPTION,
+    no_upgrade: bool = NO_UPGRADE_OPTION,
     quiet: bool = QUIET_OPTION,
     post_create: Optional[List[str]] = POST_CREATE_OPTION,
     post_sync: Optional[List[str]] = POST_SYNC_OPTION,
@@ -176,6 +177,7 @@ def update(
         targets=targets,
         post_create=post_create,
         post_sync=post_sync,
+        no_auto_upgrade=no_upgrade,
     )
 
     def compile_and_sync(venv_config: VenvConfig):
