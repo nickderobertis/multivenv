@@ -24,6 +24,8 @@ from tests.config import (
     REQUIREMENTS_IN_PATH,
     REQUIREMENTS_MULTIPLATFORM_CONFIG_PATH,
     REQUIREMENTS_OUT_PATH,
+    UPGRADE_REQUIREMENTS_IN_PATH,
+    UPGRADE_REQUIREMENTS_OUT_PATH,
 )
 from tests.dirutils import change_directory_to
 from tests.fixtures.targets import linux_310_environment
@@ -53,6 +55,26 @@ def test_compile_cli(temp_dir: Path):
         run_cli("compile")
         assert expect_out_path.exists()
         assert "appdirs==1.4.4" in expect_out_path.read_text()
+
+
+def test_compile_upgrade_cli(temp_dir: Path):
+    expect_out_path = temp_dir / "requirements.txt"
+    shutil.copy(UPGRADE_REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(UPGRADE_REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        run_cli("compile")
+        assert "appdirs==1.4.4" in expect_out_path.read_text()
+
+
+def test_compile_no_upgrade_cli(temp_dir: Path):
+    expect_out_path = temp_dir / "requirements.txt"
+    shutil.copy(UPGRADE_REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(UPGRADE_REQUIREMENTS_OUT_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        run_cli("compile --no-upgrade")
+        assert "appdirs==1.4.3" in expect_out_path.read_text()
 
 
 def test_sync_cli(temp_dir: Path):

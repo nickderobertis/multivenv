@@ -303,6 +303,7 @@ class VenvUserConfig(BaseModel):
     requirements_out: Optional[Path] = None
     targets: Optional[TargetsUserConfig] = None
     persistent: bool = True
+    upgrade: bool = True
     post_create: Optional[UserRunConfig] = None
     post_sync: Optional[UserRunConfig] = None
 
@@ -314,6 +315,7 @@ class VenvConfig(BaseModel):
     requirements_out: Path
     targets: List[TargetConfig]
     persistent: bool
+    upgrade: bool
     post_create: List[str]
     post_sync: List[str]
 
@@ -325,6 +327,7 @@ class VenvConfig(BaseModel):
         path: Path,
         global_targets: Optional[TargetsUserConfig] = None,
         global_persistent: Optional[bool] = None,
+        global_auto_upgrade: Optional[bool] = None,
         global_post_create: Optional[UserRunConfig] = None,
         global_post_sync: Optional[UserRunConfig] = None,
     ):
@@ -336,6 +339,9 @@ class VenvConfig(BaseModel):
         targets = TargetsConfig.from_user_config(user_targets)
         persistent = _get_config_from_global_user_or_default(
             global_persistent, user_config, "persistent", True
+        )
+        upgrade = _get_config_from_global_user_or_default(
+            global_auto_upgrade, user_config, "auto_upgrade", True
         )
 
         default_run_config: UserRunConfig = []
@@ -363,6 +369,7 @@ class VenvConfig(BaseModel):
             requirements_out=requirements_out,
             targets=targets.targets,
             persistent=persistent,
+            upgrade=upgrade,
             post_create=post_create,
             post_sync=post_sync,
         )

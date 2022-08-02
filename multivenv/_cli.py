@@ -36,6 +36,13 @@ NO_AUTO_SYNC_OPTION = typer.Option(
     "--no-auto-sync",
     help="Don't sync the venv before running the command",
 )
+NO_UPGRADE_OPTION = typer.Option(
+    False,
+    "-u",
+    "--no-upgrade",
+    help="Don't upgrade the dependencies when compiling. If they are already specified in "
+    "the output requirements, the same version will be used.",
+)
 PERSISTENT_OPTION = typer.Option(
     None,
     "--persistent",
@@ -126,6 +133,7 @@ def compile(
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
     targets: Optional[TargetsUserConfig] = TARGETS_OPTION,
+    no_upgrade: bool = NO_UPGRADE_OPTION,
     quiet: bool = QUIET_OPTION,
 ):
     if quiet:
@@ -136,6 +144,7 @@ def compile(
         venv_names,
         venv_folder,
         targets=targets,
+        no_auto_upgrade=no_upgrade,
     )
     return _loop_sequential_progress(
         venv_configs,
@@ -346,6 +355,7 @@ def _create_internal_venv_configs(
     venv_folder: Path,
     targets: Optional[TargetsUserConfig] = None,
     persistent: Optional[bool] = None,
+    no_auto_upgrade: bool = False,
     post_create: Optional[List[str]] = None,
     post_sync: Optional[List[str]] = None,
 ):
@@ -363,6 +373,7 @@ def _create_internal_venv_configs(
             global_persistent=persistent,
             global_post_create=post_create,
             global_post_sync=post_sync,
+            global_auto_upgrade=not no_auto_upgrade,
         )
         for name, venv_config in venvs.items()
         if name in venv_names

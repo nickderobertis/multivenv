@@ -14,20 +14,25 @@ from multivenv._ext_pip import monkey_patch_pip_packaging_markers_to_target
 def compile_venv_requirements(config: VenvConfig):
     if not config.targets:
         # Targeting only current system, compile on the current
-        return pip_tools_compile(config.requirements_in, config.requirements_out)
+        return pip_tools_compile(
+            config.requirements_in, config.requirements_out, upgrade=config.upgrade
+        )
 
     # Multiple targets, compile on each
-    # TODO: unsure why type ignores are needed here, seems accurate
     for target in config.targets:
         pip_tools_compile(
             config.requirements_in,
             config.default_requirements_out_path_for(target),
             target,
+            upgrade=config.upgrade,
         )
 
 
 def pip_tools_compile(
-    requirements_in: Path, requirements_out: Path, target: Optional[TargetConfig] = None
+    requirements_in: Path,
+    requirements_out: Path,
+    target: Optional[TargetConfig] = None,
+    upgrade: bool = True,
 ):
     ctx = click.Context(compile_click_command)  # type: ignore
 
@@ -46,4 +51,5 @@ def pip_tools_compile(
             output_file=f,
             generate_hashes=True,
             rebuild=True,
+            upgrade=upgrade,
         )
