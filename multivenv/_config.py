@@ -304,6 +304,7 @@ class VenvUserConfig(BaseModel):
     targets: Optional[TargetsUserConfig] = None
     persistent: bool = True
     post_create: Optional[UserRunConfig] = None
+    post_sync: Optional[UserRunConfig] = None
 
 
 class VenvConfig(BaseModel):
@@ -314,6 +315,7 @@ class VenvConfig(BaseModel):
     targets: List[TargetConfig]
     persistent: bool
     post_create: List[str]
+    post_sync: List[str]
 
     @classmethod
     def from_user_config(
@@ -324,6 +326,7 @@ class VenvConfig(BaseModel):
         global_targets: Optional[TargetsUserConfig] = None,
         global_persistent: Optional[bool] = None,
         global_post_create: Optional[UserRunConfig] = None,
+        global_post_sync: Optional[UserRunConfig] = None,
     ):
         user_requirements_in = user_config.requirements_in if user_config else None
         user_requirements_out = user_config.requirements_out if user_config else None
@@ -334,10 +337,20 @@ class VenvConfig(BaseModel):
         persistent = _get_config_from_global_user_or_default(
             global_persistent, user_config, "persistent", True
         )
-        default_post_create: UserRunConfig = []
+
+        default_run_config: UserRunConfig = []
         post_create = _get_config_from_global_user_or_default(
-            global_post_create, user_config, "post_create", default_post_create
+            global_post_create, user_config, "post_create", default_run_config
         )
+        if isinstance(post_create, str):
+            post_create = [post_create]
+
+        post_sync = _get_config_from_global_user_or_default(
+            global_post_sync, user_config, "post_sync", default_run_config
+        )
+        if isinstance(post_sync, str):
+            post_sync = [post_sync]
+
         requirements_in = _get_requirements_in_path(user_requirements_in, name)
         requirements_out = user_requirements_out or requirements_in.with_suffix(".txt")
 
@@ -351,6 +364,7 @@ class VenvConfig(BaseModel):
             targets=targets.targets,
             persistent=persistent,
             post_create=post_create,
+            post_sync=post_sync,
         )
 
     def default_requirements_out_path_for(

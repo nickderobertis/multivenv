@@ -77,3 +77,15 @@ def test_post_create(compiled_venv_config: VenvConfig):
     assert expect_path.exists()
     packages = get_installed_packages_in_venv(venv_config)
     assert "appdirs==1.4.4" in packages
+
+
+def test_post_sync(compiled_venv_config: VenvConfig):
+    venv_config = compiled_venv_config
+    venv_config.post_sync = ["pip install flake8==5.0.3"]
+
+    assert not venv_config.path.exists()
+    sync_venv(venv_config)
+    assert venv_config.path.exists()
+    packages = get_installed_packages_in_venv(venv_config)
+    assert "appdirs==1.4.4" in packages
+    assert "flake8==5.0.3" in packages

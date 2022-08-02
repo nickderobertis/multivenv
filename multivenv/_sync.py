@@ -12,6 +12,11 @@ def sync_venv(config: VenvConfig, errors: ErrorHandling = ErrorHandling.RAISE):
     requirements_file = find_requirements_file(config)
     pip_tools_sync(config, requirements_file)
     update_venv_state(config, requirements_file)
+    if config.post_sync:
+        for command in config.post_sync:
+            result = run_in_venv(config, command, errors=errors)
+            if errors == ErrorHandling.PROPAGATE and result.exit_code != 0:
+                exit(result.exit_code)
 
 
 def pip_tools_sync(config: VenvConfig, requirements_file: Path):

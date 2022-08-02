@@ -12,7 +12,7 @@ from cliconf.testing import CLIRunner
 
 from multivenv import _platform
 from multivenv._cli import cli
-from multivenv._config import VenvConfig
+from multivenv._config import VenvConfig, VenvUserConfig
 from multivenv.exc import CommandExitException
 from tests import ext_click
 from tests.config import (
@@ -63,14 +63,13 @@ def test_sync_cli(temp_dir: Path):
     shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
     shutil.copy(BASIC_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
-        config = VenvConfig(
+        config = VenvConfig.from_user_config(
+            VenvUserConfig(
+                requirements_in=temp_dir / "requirements.in",
+                requirements_out=temp_dir / "requirements.txt",
+            ),
             name=venv_name,
             path=venv_folder,
-            requirements_in=temp_dir / "requirements.in",
-            requirements_out=temp_dir / "requirements.txt",
-            targets=[],
-            persistent=True,
-            post_create=[],
         )
         run_cli("sync")
         assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
@@ -85,7 +84,7 @@ def test_sync_ephemeral(temp_dir: Path):
         assert "No persistent venvs found" in result.stdout
 
 
-def test_post_create(temp_dir: Path):
+def test_post_create_and_sync(temp_dir: Path):
     venv_name = "basic"
     venvs_folder = temp_dir / "venvs"
     venv_folder = venvs_folder / venv_name
@@ -93,20 +92,23 @@ def test_post_create(temp_dir: Path):
     shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
     shutil.copy(HOOKS_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
-        config = VenvConfig(
+        config = VenvConfig.from_user_config(
+            VenvUserConfig(
+                requirements_in=temp_dir / "requirements.in",
+                requirements_out=temp_dir / "requirements.txt",
+            ),
             name=venv_name,
             path=venv_folder,
-            requirements_in=temp_dir / "requirements.in",
-            requirements_out=temp_dir / "requirements.txt",
-            targets=[],
-            persistent=True,
-            post_create=[],
         )
         expect_path = (config.path / "post_create.txt").resolve()
         assert not expect_path.exists()
         run_cli("sync")
+        # Check post_create hook
         assert expect_path.exists()
-        assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+        packages = get_installed_packages_in_venv(config)
+        assert "appdirs==1.4.4" in packages
+        # Check post_sync hook
+        assert "flake8==5.0.3" in packages
 
 
 def test_update_cli(temp_dir: Path):
@@ -117,14 +119,13 @@ def test_update_cli(temp_dir: Path):
     shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
     shutil.copy(BASIC_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
-        config = VenvConfig(
+        config = VenvConfig.from_user_config(
+            VenvUserConfig(
+                requirements_in=temp_dir / "requirements.in",
+                requirements_out=temp_dir / "requirements.txt",
+            ),
             name=venv_name,
             path=venv_folder,
-            requirements_in=temp_dir / "requirements.in",
-            requirements_out=temp_dir / "requirements.txt",
-            targets=[],
-            persistent=True,
-            post_create=[],
         )
         assert not expect_requirements_out_path.exists()
         run_cli("update")
@@ -148,14 +149,13 @@ def test_update_multiplatform_cli(temp_dir: Path, linux_310_environment):
     shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
     shutil.copy(REQUIREMENTS_MULTIPLATFORM_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
-        config = VenvConfig(
+        config = VenvConfig.from_user_config(
+            VenvUserConfig(
+                requirements_in=temp_dir / "requirements.in",
+                requirements_out=temp_dir / "requirements.txt",
+            ),
             name=venv_name,
             path=venv_folder,
-            requirements_in=temp_dir / "requirements.in",
-            requirements_out=temp_dir / "requirements.txt",
-            targets=[],
-            persistent=True,
-            post_create=[],
         )
         for path in expect_requirements_out_paths:
             assert not path.exists()

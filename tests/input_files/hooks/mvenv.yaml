@@ -4,3 +4,4 @@ post_create:
   - python -c 'from pathlib import Path;import sys;p = Path(sys.executable).parent.parent / "post_create.txt";p.touch()'
 venvs:
   basic:
+    post_sync: pip install flake8==5.0.3
