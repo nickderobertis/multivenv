@@ -8,6 +8,8 @@ from tests.config import (
     REQUIREMENTS_IN_PATH,
     REQUIREMENTS_MULTIPLATFORM_OUT_PATH,
     REQUIREMENTS_OUT_PATH,
+    UPGRADE_REQUIREMENTS_IN_PATH,
+    UPGRADE_REQUIREMENTS_OUT_PATH,
 )
 from tests.fixtures.temp_dir import temp_dir
 
@@ -55,4 +57,17 @@ def compiled_multiplatform_venv_config(
     shutil.copy(
         REQUIREMENTS_MULTIPLATFORM_OUT_PATH, venv_config.requirements_out.parent
     )
+    yield venv_config
+
+
+@pytest.fixture
+def needs_upgrade_compiled_venv_config(temp_dir: Path) -> VenvConfig:
+    name = "basic"
+    requirements_in_path = temp_dir / "requirements.in"
+    shutil.copy(UPGRADE_REQUIREMENTS_IN_PATH, requirements_in_path)
+    venv_path = temp_dir / "venvs" / name
+    venv_config = VenvConfig.from_user_config(
+        VenvUserConfig(requirements_in=requirements_in_path), name, venv_path
+    )
+    shutil.copy(UPGRADE_REQUIREMENTS_OUT_PATH, venv_config.requirements_out)
     yield venv_config

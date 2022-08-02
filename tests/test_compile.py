@@ -56,3 +56,11 @@ def test_compile_multiple_versions_and_platforms(multiplatform_venv_config: Venv
         text = venv_config.default_requirements_out_path_for(target).read_text()
         assert "appdirs==1.4.4" in text
         assert "mvenv compile" in text
+
+
+def test_compile_upgrade(needs_upgrade_compiled_venv_config: VenvConfig):
+    venv_config = needs_upgrade_compiled_venv_config
+    compile_venv_requirements(venv_config)
+    text = venv_config.requirements_out.read_text()
+    assert "appdirs==1.4.4" in text
+    assert "mvenv compile" in text
