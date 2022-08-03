@@ -1,12 +1,9 @@
-import platform
+import os
 from enum import Enum
 
 from multivenv._config import VenvConfig
-from multivenv._ext_subprocess import (
-    CLIResult,
-    run,
-    split_first_arg_of_command_from_rest,
-)
+from multivenv._ext_subprocess import CLIResult, run
+from multivenv.exc import VenvNotSyncedException
 
 
 class ErrorHandling(str, Enum):
@@ -25,26 +22,31 @@ def run_in_venv(
     stream: bool = True,
     errors: ErrorHandling = ErrorHandling.PROPAGATE,
 ) -> CLIResult:
-    new_command = _venv_command(config, command)
-    return run(new_command, stream=stream, check=errors.should_check)
+    return _activate_and_run(config, command, stream=stream, errors=errors)
 
 
-def _venv_command(config: VenvConfig, command: str) -> str:
-    if platform.system() == "Windows":
-        return _venv_command_windows(config, command)
-    return _venv_command_unix(config, command)
-
-
-def _venv_command_unix(config: VenvConfig, command: str):
-    executable, command = split_first_arg_of_command_from_rest(command)
-    bin_path = config.path / "bin" / executable
-    venv_command = f"{bin_path} {command}"
-    return venv_command
-
-
-def _venv_command_windows(config: VenvConfig, command: str):
-    executable, command = split_first_arg_of_command_from_rest(command)
-    scripts_path = config.path / "Scripts"
-    bin_path = scripts_path / f"{executable}.exe"
-    venv_command = f"{bin_path} {command}"
-    return venv_command
+def _activate_and_run(
+    config: VenvConfig,
+    command: str,
+    stream: bool = True,
+    errors: ErrorHandling = ErrorHandling.PROPAGATE,
+) -> CLIResult:
+    bin_path = config.path / "bin"
+    if not bin_path.exists():
+        raise VenvNotSyncedException(
+            f"Must sync the {config.name} venv as it is a persistent venv and auto-sync is disabled."
+        )
+    current_path = os.getenv("PATH")
+    extra_env = {
+        "VIRTUAL_ENV": str(config.path),
+        "PATH": f"{bin_path}{os.path.pathsep}{current_path}"
+        if current_path
+        else str(bin_path),
+    }
+    return run(
+        command,
+        stream=stream,
+        check=errors.should_check,
+        env=extra_env,
+        extend_existing_env=True,
+    )

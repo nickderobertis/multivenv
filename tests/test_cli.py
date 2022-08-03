@@ -13,7 +13,7 @@ from cliconf.testing import CLIRunner
 from multivenv import _platform
 from multivenv._cli import cli
 from multivenv._config import VenvConfig, VenvUserConfig
-from multivenv.exc import CommandExitException
+from multivenv.exc import CommandExitException, VenvNotSyncedException
 from tests import ext_click
 from tests.config import (
     BASIC_CONFIG_PATH,
@@ -261,8 +261,8 @@ def test_run_cli_no_auto_sync(temp_dir: Path):
     shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
     shutil.copy(BASIC_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
-        output = run_cli("run basic pip freeze --no-auto-sync")
-        assert is_not_found_output(output.stdout)
+        with pytest.raises(VenvNotSyncedException):
+            run_cli("run basic pip freeze --no-auto-sync")
 
 
 def test_run_ephemeral(temp_dir: Path):

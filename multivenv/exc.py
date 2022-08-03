@@ -22,6 +22,10 @@ class RequirementsFileException(MultivenvException):
     pass
 
 
+class VenvNotSyncedException(MultivenvException):
+    pass
+
+
 class CompiledRequirementsNotFoundException(RequirementsFileException):
     pass
 

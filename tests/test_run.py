@@ -24,3 +24,8 @@ def test_run_with_error(synced_venv: VenvConfig):
     assert error.exit_code != 0
     assert is_not_found_output(error.output)
     assert is_not_found_output(str(error))
+
+
+def test_run_binary_not_in_venv(synced_venv: VenvConfig):
+    result = run_in_venv(synced_venv, "bash -c 'pip freeze'")
+    assert "appdirs==1.4.4" in result
