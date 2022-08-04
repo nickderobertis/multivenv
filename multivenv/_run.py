@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from pathlib import Path
 
 from multivenv._config import VenvConfig
 from multivenv._ext_subprocess import CLIResult, run
@@ -31,7 +32,7 @@ def _activate_and_run(
     stream: bool = True,
     errors: ErrorHandling = ErrorHandling.PROPAGATE,
 ) -> CLIResult:
-    bin_path = config.path / "bin"
+    bin_path = _get_bin_path(config)
     if not bin_path.exists():
         raise VenvNotSyncedException(
             f"Must sync the {config.name} venv as it is a persistent venv and auto-sync is disabled."
@@ -50,3 +51,10 @@ def _activate_and_run(
         env=extra_env,
         extend_existing_env=True,
     )
+
+
+def _get_bin_path(config: VenvConfig) -> Path:
+    # Check the OS to determine the correct path to the bin directory
+    if os.name == "nt":
+        return config.path / "Scripts"
+    return config.path / "bin"
