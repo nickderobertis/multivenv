@@ -4,7 +4,7 @@ from subprocess import run
 import conf
 import version
 
-DISTRIBUTION_NAME = f"{conf.PACKAGE_NAME}-{version.__version__}"
+DISTRIBUTION_NAME = f"{conf.PACKAGE_NAME}-{version.get_version()}"
 DISTRIBUTION_PATH = f"dist/{DISTRIBUTION_NAME}.tar.gz"
 
 

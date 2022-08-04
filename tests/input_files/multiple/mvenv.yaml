@@ -2,3 +2,4 @@ venv_folder: venvs
 venv_names: null
 venvs:
   basic:
+  second:
