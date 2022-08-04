@@ -334,7 +334,8 @@ def info(
     if info_format == InfoFormat.TEXT:
         printer.print(all_info)
     elif info_format == InfoFormat.JSON:
-        printer.print(all_info.json(indent=2))
+        # Yse stasndard print so that there are no automatic line breaks
+        print(all_info.json(indent=2))
     else:
         raise NotImplementedError(f"Info format {info_format} not implemented")
 
