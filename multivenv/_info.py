@@ -1,7 +1,7 @@
 import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Sequence
 
 from pydantic import BaseModel, Field
 
@@ -13,7 +13,10 @@ from multivenv._config import (
 )
 from multivenv._find_reqs import find_requirements_file
 from multivenv._state import VenvState
-from multivenv.exc import CompiledRequirementsNotFoundException
+from multivenv.exc import (
+    CompiledRequirementsNotFoundException,
+    MutlivenvConfigVenvsNotDefinedException,
+)
 
 
 class InfoFormat(str, Enum):
@@ -47,6 +50,7 @@ class SystemInfo(BaseModel):
     version: PythonVersionConfig
     platform: PlatformConfig
     file_extensions: FileExtensions = Field(default_factory=FileExtensions.from_system)
+    cwd: Path = Field(default_factory=Path.cwd)
 
     @classmethod
     def from_system(cls) -> "SystemInfo":
@@ -110,9 +114,25 @@ class VenvInfo(BaseModel):
     targets: List[TargetInfo]
 
 
+class ConfigInfo(BaseModel):
+    path: Path
+
+
 class AllInfo(BaseModel):
     venv_info: List[VenvInfo]
+    config_info: ConfigInfo
     system: SystemInfo = Field(default_factory=SystemInfo.from_system)
+
+    @classmethod
+    def from_configs(cls, venv_configs: Sequence[VenvConfig]) -> "AllInfo":
+        venv_info = [create_venv_info(venv_config) for venv_config in venv_configs]
+        if len(venv_info) == 0:
+            raise MutlivenvConfigVenvsNotDefinedException(
+                "No venvs defined. Run --config-gen to generate a config file."
+            )
+        venv_config = venv_configs[0]
+        config_info = ConfigInfo(path=venv_config.config_path)
+        return cls(venv_info=venv_info, config_info=config_info)
 
     def __getitem__(self, item) -> VenvInfo:
         return self.venv_info[item]
@@ -129,8 +149,8 @@ class AllInfo(BaseModel):
 
 def create_venv_info(config: VenvConfig) -> VenvInfo:
     config_requirements = RequirementsInfo(
-        in_path=config.requirements_in,
-        out_path=config.requirements_out,
+        in_path=config.user_configured_requirements_in,
+        out_path=config.user_configured_requirements_out,
     )
 
     try:

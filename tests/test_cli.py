@@ -12,6 +12,7 @@ from cliconf.testing import CLIRunner
 
 from multivenv import _platform
 from multivenv._cli import cli
+from multivenv._cli import info as info_cli
 from multivenv._config import VenvConfig, VenvUserConfig
 from multivenv.exc import CommandExitException, VenvNotSyncedException
 from tests import ext_click
@@ -91,7 +92,8 @@ def test_sync_cli(temp_dir: Path):
                 requirements_out=temp_dir / "requirements.txt",
             ),
             name=venv_name,
-            path=venv_folder,
+            venv_path=venv_folder,
+            config_path=temp_dir / "mvenv.yaml",
         )
         run_cli("sync")
         assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
@@ -120,7 +122,8 @@ def test_post_create_and_sync(temp_dir: Path):
                 requirements_out=temp_dir / "requirements.txt",
             ),
             name=venv_name,
-            path=venv_folder,
+            venv_path=venv_folder,
+            config_path=temp_dir / "mvenv.yaml",
         )
         expect_path = (config.path / "post_create.txt").resolve()
         assert not expect_path.exists()
@@ -147,7 +150,8 @@ def test_update_cli(temp_dir: Path):
                 requirements_out=temp_dir / "requirements.txt",
             ),
             name=venv_name,
-            path=venv_folder,
+            venv_path=venv_folder,
+            config_path=temp_dir / "mvenv.yaml",
         )
         assert not expect_requirements_out_path.exists()
         run_cli("update")
@@ -177,7 +181,8 @@ def test_update_multiplatform_cli(temp_dir: Path, linux_310_environment):
                 requirements_out=temp_dir / "requirements.txt",
             ),
             name=venv_name,
-            path=venv_folder,
+            venv_path=venv_folder,
+            config_path=temp_dir / "mvenv.yaml",
         )
         for path in expect_requirements_out_paths:
             assert not path.exists()
@@ -211,7 +216,8 @@ def test_update_cli_with_upgrade(temp_dir: Path):
                 requirements_out=temp_dir / "requirements.txt",
             ),
             name=venv_name,
-            path=venv_folder,
+            venv_path=venv_folder,
+            config_path=temp_dir / "mvenv.yaml",
         )
         run_cli("update")
         assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
@@ -231,7 +237,8 @@ def test_update_cli_with_no_upgrade(temp_dir: Path):
                 requirements_out=temp_dir / "requirements.txt",
             ),
             name=venv_name,
-            path=venv_folder,
+            venv_path=venv_folder,
+            config_path=temp_dir / "mvenv.yaml",
         )
         run_cli("update --no-upgrade")
         assert "appdirs==1.4.3" in get_installed_packages_in_venv(config)
@@ -342,6 +349,7 @@ def test_info_no_venv(temp_dir: Path):
         assert "requirements.txt" in output.stdout
         assert "requirements.in" in output.stdout
         assert "exists=False" in output.stdout
+        assert "mvenv.yaml" in output.stdout
 
 
 def test_info_json(temp_dir: Path):
@@ -356,7 +364,9 @@ def test_info_json(temp_dir: Path):
         assert "requirements.txt" in output.stdout
         assert info["config_requirements"]["in_path"] == "requirements.in"
         assert info["config_requirements"]["out_path"] == "requirements.txt"
-        assert info["discovered_requirements"]["in_path"] == "requirements.in"
+        assert info["discovered_requirements"]["in_path"] == str(
+            temp_dir / "requirements.in"
+        )
         assert info["discovered_requirements"]["out_path"] == None
         assert info["exists"] is False
         assert data["system"]["version"]["version"]["major"] == 3
@@ -378,6 +388,45 @@ def test_info_with_venv(temp_dir: Path):
         assert "exists=True" in output.stdout
         assert "3" in output.stdout
         assert BASIC_REQUIREMENTS_HASH in output.stdout
+
+
+def test_info_from_subdir(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    shutil.copy(BASIC_CONFIG_PATH, temp_dir)
+    subdir = temp_dir / "subdir"
+    subdir.mkdir()
+    with change_directory_to(subdir):
+        output = run_cli("info")
+        assert "basic" in output.stdout
+        assert "venvs" in output.stdout
+        assert "requirements.txt" in output.stdout
+        assert "requirements.in" in output.stdout
+        assert "exists=False" in output.stdout
+
+
+def test_info_from_subdir_with_absolute_path_in_config(temp_dir: Path):
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    cls = info_cli.model_cls
+    model = cls(
+        venvs={
+            "basic": VenvUserConfig(
+                requirements_in=(temp_dir / "requirements.in").resolve(),
+                requirements_out=(temp_dir / "requirements.txt").resolve(),
+            )
+        }
+    )
+    model.settings.custom_config_folder = temp_dir
+    model.save()
+    subdir = temp_dir / "subdir"
+    subdir.mkdir()
+    with change_directory_to(subdir):
+        output = run_cli("info")
+        info_line = output.stdout.replace("\n", "")
+        assert "basic" in info_line
+        assert "venvs" in info_line
+        assert "requirements.txt" in info_line
+        assert "requirements.in" in info_line
+        assert "exists=False" in info_line
 
 
 # TODO: Tests for run-all error handling

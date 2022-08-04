@@ -21,7 +21,10 @@ def venv_config(temp_dir: Path) -> VenvConfig:
     shutil.copy(REQUIREMENTS_IN_PATH, requirements_in_path)
     venv_path = temp_dir / "venvs" / name
     yield VenvConfig.from_user_config(
-        VenvUserConfig(requirements_in=requirements_in_path), name, venv_path
+        VenvUserConfig(requirements_in=requirements_in_path),
+        name,
+        venv_path,
+        temp_dir / "mvenv.yaml",
     )
 
 

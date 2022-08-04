@@ -19,7 +19,7 @@ def test_info(venv_config: VenvConfig):
         assert info.path == venv_config.path
         assert info.exists == venv_config.path.exists()
         assert info.config_requirements.in_path == venv_config.requirements_in
-        assert info.config_requirements.out_path == venv_config.requirements_out
+        assert info.config_requirements.out_path == Path("requirements.txt")
         assert info.discovered_requirements.in_path == venv_config.requirements_in
         assert info.discovered_requirements.out_path == venv_config.requirements_out
         assert info.state.needs_sync is True

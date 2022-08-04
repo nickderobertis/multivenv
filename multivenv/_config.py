@@ -318,13 +318,16 @@ class VenvConfig(BaseModel):
     upgrade: bool
     post_create: List[str]
     post_sync: List[str]
+    config_path: Path
+    user_config: Optional[VenvUserConfig]
 
     @classmethod
     def from_user_config(
         cls,
         user_config: Optional[VenvUserConfig],
         name: str,
-        path: Path,
+        venv_path: Path,
+        config_path: Path,
         global_targets: Optional[TargetsUserConfig] = None,
         global_persistent: Optional[bool] = None,
         global_auto_upgrade: Optional[bool] = None,
@@ -357,10 +360,18 @@ class VenvConfig(BaseModel):
         if isinstance(post_sync, str):
             post_sync = [post_sync]
 
-        requirements_in = _get_requirements_in_path(user_requirements_in, name)
-        requirements_out = user_requirements_out or requirements_in.with_suffix(".txt")
+        requirements_in = _get_requirements_in_path(
+            user_requirements_in, name, config_path
+        )
+        requirements_out = _relative_to_config_path_if_not_absolute(
+            user_requirements_out or requirements_in.with_suffix(".txt"), config_path
+        )
 
-        use_path = path if persistent else create_temp_path() / path.name
+        use_path = (
+            _relative_to_config_path_if_not_absolute(venv_path, config_path)
+            if persistent
+            else create_temp_path() / venv_path.name
+        )
 
         return cls(
             name=name,
@@ -372,6 +383,8 @@ class VenvConfig(BaseModel):
             upgrade=upgrade,
             post_create=post_create,
             post_sync=post_sync,
+            config_path=config_path,
+            user_config=user_config,
         )
 
     def default_requirements_out_path_for(
@@ -392,14 +405,40 @@ class VenvConfig(BaseModel):
         # Go to default configured path (no version or platform extension)
         yield self.requirements_out
 
+    @property
+    def user_configured_requirements_in(self) -> Path:
+        if self.user_config and self.user_config.requirements_in:
+            return self.user_config.requirements_in
+        return self.requirements_in.relative_to(self.config_path.parent)
 
-def _get_requirements_in_path(user_requirements_in: Optional[Path], name: str) -> Path:
+    @property
+    def user_configured_requirements_out(self) -> Path:
+        if self.user_config and self.user_config.requirements_out:
+            return self.user_config.requirements_out
+        return self.requirements_out.relative_to(self.config_path.parent)
+
+
+def _get_requirements_in_path(
+    user_requirements_in: Optional[Path], name: str, config_path: Path
+) -> Path:
     if user_requirements_in is not None:
-        return user_requirements_in
-    for path in [Path(f"{name}-requirements.in"), Path("requirements.in")]:
-        if path.exists():
-            return path
+        return _relative_to_config_path_if_not_absolute(
+            user_requirements_in, config_path
+        )
+    for path in [
+        f"{name}-requirements.in",
+        "requirements.in",
+    ]:
+        abs_path = _relative_to_config_path_if_not_absolute(Path(path), config_path)
+        if abs_path.exists():
+            return abs_path
     raise ValueError("Could not find requirements file")
+
+
+def _relative_to_config_path_if_not_absolute(path: Path, config_path: Path) -> Path:
+    if path.is_absolute():
+        return path
+    return config_path.parent / path
 
 
 T = TypeVar("T")

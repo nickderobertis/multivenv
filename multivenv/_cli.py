@@ -3,12 +3,13 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, TypeVar
 
 import cliconf
 import typer
+from pyappconf import BaseConfig, ConfigFormats
 from rich.progress import Progress
 
 from multivenv._compile import compile_venv_requirements
 from multivenv._config import TargetsUserConfig, VenvConfig, VenvUserConfig
 from multivenv._delete import delete_venv
-from multivenv._info import AllInfo, InfoFormat, create_venv_info
+from multivenv._info import AllInfo, InfoFormat
 from multivenv._run import ErrorHandling, run_in_venv
 from multivenv._state import venv_needs_sync
 from multivenv._styles import printer, styled
@@ -17,9 +18,12 @@ from multivenv.exc import MutlivenvConfigVenvsNotDefinedException, NoSuchVenvExc
 
 cli = cliconf.CLIConf(name="mvenv")
 conf_settings = cliconf.CLIAppConfig(
-    app_name="mvenv", config_name="mvenv", multi_format=True
+    app_name="mvenv",
+    config_name="mvenv",
+    multi_format=True,
+    default_format=ConfigFormats.YAML,
 )
-cliconf_settings = cliconf.CLIConfSettings(recursive_loading=True)
+cliconf_settings = cliconf.CLIConfSettings(recursive_loading=True, inject_model=True)
 
 COMMAND_ARG = typer.Argument(..., help="Command to run")
 
@@ -97,6 +101,7 @@ Venvs = Dict[str, Optional[VenvUserConfig]]
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def sync(
+    cli_model: BaseConfig,
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
@@ -109,7 +114,12 @@ def sync(
         printer.make_quiet()
 
     venv_configs = _create_internal_venv_configs(
-        venvs, venv_names, venv_folder, post_create=post_create, post_sync=post_sync
+        venvs,
+        venv_names,
+        venv_folder,
+        cli_model.settings.config_location,
+        post_create=post_create,
+        post_sync=post_sync,
     )
     should_sync_venv_configs = [
         venv_config for venv_config in venv_configs if venv_config.persistent
@@ -129,6 +139,7 @@ def sync(
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def compile(
+    cli_model: BaseConfig,
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
@@ -143,6 +154,7 @@ def compile(
         venvs,
         venv_names,
         venv_folder,
+        cli_model.settings.config_location,
         targets=targets,
         no_auto_upgrade=no_upgrade,
     )
@@ -157,6 +169,7 @@ def compile(
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def update(
+    cli_model: BaseConfig,
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
@@ -174,6 +187,7 @@ def update(
         venvs,
         venv_names,
         venv_folder,
+        cli_model.settings.config_location,
         targets=targets,
         post_create=post_create,
         post_sync=post_sync,
@@ -196,6 +210,7 @@ def update(
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def run(
+    cli_model: BaseConfig,
     venv_name: str = typer.Argument(
         ..., help="Name of the virtual environment to run command in"
     ),
@@ -216,6 +231,7 @@ def run(
         venvs,
         [venv_name],
         venv_folder,
+        cli_model.settings.config_location,
         persistent=persistent,
         post_create=post_create,
         post_sync=post_sync,
@@ -245,6 +261,7 @@ def run(
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def run_all(
+    cli_model: BaseConfig,
     command: List[str] = COMMAND_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
@@ -262,6 +279,7 @@ def run_all(
         venvs,
         None,
         venv_folder,
+        cli_model.settings.config_location,
         persistent=persistent,
         post_create=post_create,
         post_sync=post_sync,
@@ -288,6 +306,7 @@ def run_all(
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def info(
+    cli_model: BaseConfig,
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     info_format: InfoFormat = typer.Option(
         InfoFormat.TEXT,
@@ -308,11 +327,10 @@ def info(
         venvs,
         venv_names,
         venv_folder,
+        cli_model.settings.config_location,
         targets=targets,
     )
-    all_info = AllInfo(
-        venv_info=[create_venv_info(venv_config) for venv_config in venv_configs]
-    )
+    all_info = AllInfo.from_configs(venv_configs)
     if info_format == InfoFormat.TEXT:
         printer.print(all_info)
     elif info_format == InfoFormat.JSON:
@@ -326,6 +344,7 @@ def info(
 @cli.command()
 @cliconf.configure(conf_settings, cliconf_settings)
 def delete(
+    cli_model: BaseConfig,
     venv_names: Optional[List[str]] = VENV_NAMES_ARG,
     venvs: Optional[Venvs] = None,
     venv_folder: Path = VENV_FOLDER_OPTION,
@@ -334,7 +353,9 @@ def delete(
     if quiet:
         printer.make_quiet()
 
-    venv_configs = _create_internal_venv_configs(venvs, venv_names, venv_folder)
+    venv_configs = _create_internal_venv_configs(
+        venvs, venv_names, venv_folder, cli_model.settings.config_location
+    )
     should_delete_venv_configs = [
         venv_config
         for venv_config in venv_configs
@@ -355,6 +376,7 @@ def _create_internal_venv_configs(
     venvs: Optional[Venvs],
     venv_names: Optional[List[str]],
     venv_folder: Path,
+    config_path: Path,
     targets: Optional[TargetsUserConfig] = None,
     persistent: Optional[bool] = None,
     no_auto_upgrade: bool = False,
@@ -371,6 +393,7 @@ def _create_internal_venv_configs(
             venv_config,
             name,
             venv_folder / name,
+            config_path,
             global_targets=targets,
             global_persistent=persistent,
             global_post_create=post_create,

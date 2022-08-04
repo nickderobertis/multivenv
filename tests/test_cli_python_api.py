@@ -25,8 +25,8 @@ def test_info(temp_dir: Path):
     shutil.copy(REQUIREMENTS_OUT_PATH, temp_dir)
     venvs: multivenv.Venvs = {"basic": None}
     with change_directory_to(temp_dir):
-        multivenv.sync(venvs=venvs)
-        all_info = multivenv.info(["basic"], venvs=venvs)
+        multivenv.sync.invoke(venvs=venvs)
+        all_info = multivenv.info.invoke(venv_names=["basic"], venvs=venvs)
         assert len(all_info) == 1
         current_target = TargetConfig.from_system()
         assert all_info.system.version == current_target.version
@@ -59,8 +59,10 @@ def test_target_info(temp_dir: Path):
     )
     venvs: multivenv.Venvs = {"basic": None}
     with change_directory_to(temp_dir):
-        multivenv.sync(venvs=venvs)
-        all_info = multivenv.info(["basic"], venvs=venvs, targets=targets)
+        multivenv.sync.invoke(venvs=venvs)
+        all_info = multivenv.info.invoke(
+            venv_names=["basic"], venvs=venvs, targets=targets
+        )
         assert len(all_info) == 1
         info = all_info[0]
         assert len(info.targets) == 1
