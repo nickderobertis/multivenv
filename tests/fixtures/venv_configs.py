@@ -47,6 +47,7 @@ def multiplatform_venv_config(temp_dir: Path) -> VenvConfig:
         VenvUserConfig(requirements_in=requirements_in_path),
         name,
         venv_path,
+        temp_dir / "mvenv.yaml",
         global_targets=targets,
     )
 
@@ -70,7 +71,10 @@ def needs_upgrade_compiled_venv_config(temp_dir: Path) -> VenvConfig:
     shutil.copy(UPGRADE_REQUIREMENTS_IN_PATH, requirements_in_path)
     venv_path = temp_dir / "venvs" / name
     venv_config = VenvConfig.from_user_config(
-        VenvUserConfig(requirements_in=requirements_in_path), name, venv_path
+        VenvUserConfig(requirements_in=requirements_in_path),
+        name,
+        venv_path,
+        temp_dir / "mvenv.yaml",
     )
     shutil.copy(UPGRADE_REQUIREMENTS_OUT_PATH, venv_config.requirements_out)
     yield venv_config
