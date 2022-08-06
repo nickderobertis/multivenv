@@ -1,4 +1,9 @@
-from multivenv._state import VenvState, create_venv_state, update_venv_state
+from multivenv._state import (
+    VenvState,
+    create_venv_state,
+    update_venv_state,
+    venv_needs_sync,
+)
 from tests.config import BASIC_REQUIREMENTS_HASH
 from tests.fixtures.venv_configs import *
 
@@ -26,6 +31,25 @@ def test_update_state(compiled_venv_config: VenvConfig):
     assert (
         state.needs_sync(venv_config.sync_paths(venv_config.requirements_out)) is False
     )
+
+
+def test_needs_sync_bad_state_json(compiled_venv_config: VenvConfig):
+    venv_config = compiled_venv_config
+    config_path = venv_config.path / "mvenv-state.json"
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_text("bad state")
+    assert venv_needs_sync(venv_config)
+
+
+def test_needs_sync_bad_state_wrong_types(compiled_venv_config: VenvConfig):
+    venv_config = compiled_venv_config
+    config_path = venv_config.path / "mvenv-state.json"
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    state = VenvState.create_empty(venv_config.path)
+    state.hashes = "not a dict"
+    state.settings.custom_config_folder = config_path.parent
+    state.save()
+    assert venv_needs_sync(venv_config)
 
 
 def test_needs_sync_changed_extra_file(compiled_venv_config: VenvConfig):

@@ -1,9 +1,11 @@
 import datetime
 import hashlib
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Dict, Optional, Sequence
 
 from pyappconf import AppConfig, BaseConfig, ConfigFormats
+from pydantic import ValidationError
 
 from multivenv._config import VenvConfig
 from multivenv._find_reqs import find_requirements_file
@@ -26,7 +28,7 @@ def update_venv_state(config: VenvConfig, requirements_file: Path) -> "VenvState
 def venv_needs_sync(config: VenvConfig) -> bool:
     try:
         state = VenvState.load(config.path)
-    except FileNotFoundError:
+    except (FileNotFoundError, JSONDecodeError, ValidationError):
         return True
     requirements_file = find_requirements_file(config)
     return state.needs_sync(config.sync_paths(requirements_file))
