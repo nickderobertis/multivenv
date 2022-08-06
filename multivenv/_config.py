@@ -306,6 +306,7 @@ class VenvUserConfig(BaseModel):
     upgrade: bool = True
     post_create: Optional[UserRunConfig] = None
     post_sync: Optional[UserRunConfig] = None
+    auto_sync_changed: Optional[List[Path]] = None
 
 
 class VenvConfig(BaseModel):
@@ -318,6 +319,7 @@ class VenvConfig(BaseModel):
     upgrade: bool
     post_create: List[str]
     post_sync: List[str]
+    auto_sync_changed: List[Path]
     config_path: Path
     user_config: Optional[VenvUserConfig]
 
@@ -360,6 +362,15 @@ class VenvConfig(BaseModel):
         if isinstance(post_sync, str):
             post_sync = [post_sync]
 
+        auto_sync_changed = (
+            [
+                _relative_to_config_path_if_not_absolute(file, config_path)
+                for file in user_config.auto_sync_changed
+            ]
+            if user_config and user_config.auto_sync_changed is not None
+            else []
+        )
+
         requirements_in = _get_requirements_in_path(
             user_requirements_in, name, config_path
         )
@@ -383,6 +394,7 @@ class VenvConfig(BaseModel):
             upgrade=upgrade,
             post_create=post_create,
             post_sync=post_sync,
+            auto_sync_changed=auto_sync_changed,
             config_path=config_path,
             user_config=user_config,
         )
@@ -416,6 +428,11 @@ class VenvConfig(BaseModel):
         if self.user_config and self.user_config.requirements_out:
             return self.user_config.requirements_out
         return self.requirements_out.relative_to(self.config_path.parent)
+
+    def sync_paths(self, requirements_file: Path) -> List[Path]:
+        if self.auto_sync_changed:
+            return [requirements_file, *self.auto_sync_changed]
+        return [requirements_file]
 
 
 def _get_requirements_in_path(

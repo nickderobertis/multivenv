@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from multivenv._config import TargetsUserConfig, VenvConfig, VenvUserConfig
+from multivenv._state import update_venv_state
 from tests.config import (
     REQUIREMENTS_IN_PATH,
     REQUIREMENTS_MULTIPLATFORM_OUT_PATH,

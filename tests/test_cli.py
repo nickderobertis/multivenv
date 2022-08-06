@@ -17,9 +17,9 @@ from multivenv._config import VenvConfig, VenvUserConfig
 from multivenv.exc import CommandExitException, VenvNotSyncedException
 from tests import ext_click
 from tests.config import (
+    AUTO_SYNC_CHANGED_CONFIG_PATH,
     BASIC_CONFIG_PATH,
     BASIC_REQUIREMENTS_HASH,
-    BASIC_STATE_CONFIG_PATH,
     EPHEMERAL_CONFIG_PATH,
     HOOKS_CONFIG_PATH,
     REQUIREMENTS_IN_PATH,
@@ -462,3 +462,23 @@ def test_delete_non_synced(temp_dir: Path):
     with change_directory_to(temp_dir):
         result = run_cli("delete")
         assert "No existing venvs found matching the given criteria" in result.stdout
+
+
+def test_manage_external_dependencies(temp_dir: Path):
+    # Set up dependencies so that they are specified in an external file
+    extra_path = temp_dir / "extra.txt"
+    shutil.copy(REQUIREMENTS_IN_PATH, temp_dir)
+    (temp_dir / "requirements.txt").write_text("")
+    extra_path.write_text("")
+    shutil.copy(AUTO_SYNC_CHANGED_CONFIG_PATH, temp_dir)
+    with change_directory_to(temp_dir):
+        output = run_cli("run basic pip freeze")
+        assert "appdirs==1.4.4" not in output.stdout
+
+        # Now change the extra file to add the requirement
+        shutil.copy(REQUIREMENTS_OUT_PATH, extra_path)
+
+        # Should auto-sync before running the command
+        output2 = run_cli("run basic pip freeze")
+        # Now the dependency is installed
+        assert "appdirs==1.4.4" in output2.stdout

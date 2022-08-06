@@ -1,0 +1,7 @@
+venv_folder: venvs
+venv_names: null
+venvs:
+  basic:
+    post_sync: pip install -r extra.txt
+    auto_sync_changed:
+      - "extra.txt"

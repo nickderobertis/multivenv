@@ -10,8 +10,10 @@ def test_create_state(venv_config: VenvConfig):
     config_path = venv_config.path / "mvenv-state.json"
     assert config_path.exists()
     state = VenvState.load(config_path)
-    assert state.requirements_hash == ""
-    assert state.needs_sync(venv_config.requirements_out) is True
+    assert state.hash_for(venv_config.requirements_out) is None
+    assert (
+        state.needs_sync(venv_config.sync_paths(venv_config.requirements_out)) is True
+    )
 
 
 def test_update_state(compiled_venv_config: VenvConfig):
@@ -20,5 +22,28 @@ def test_update_state(compiled_venv_config: VenvConfig):
     config_path = venv_config.path / "mvenv-state.json"
     assert config_path.exists()
     state = VenvState.load(config_path)
-    assert state.requirements_hash == BASIC_REQUIREMENTS_HASH
-    assert state.needs_sync(venv_config.requirements_out) is False
+    assert state.hash_for(venv_config.requirements_out) == BASIC_REQUIREMENTS_HASH
+    assert (
+        state.needs_sync(venv_config.sync_paths(venv_config.requirements_out)) is False
+    )
+
+
+def test_needs_sync_changed_extra_file(compiled_venv_config: VenvConfig):
+    venv_config = compiled_venv_config
+    extra_path = venv_config.path.parent.parent / "extra.txt"
+    extra_path.write_text("extra")
+    venv_config.auto_sync_changed = [extra_path]
+    update_venv_state(venv_config, venv_config.requirements_out)
+    config_path = venv_config.path / "mvenv-state.json"
+    assert config_path.exists()
+    state = VenvState.load(config_path)
+    assert state.hash_for(venv_config.requirements_out) == BASIC_REQUIREMENTS_HASH
+    assert state.hash_for(extra_path) == "ea9f91b2cda019730f2891bd12a7a4d6"
+    assert (
+        state.needs_sync(venv_config.sync_paths(venv_config.requirements_out)) is False
+    )
+    extra_path.write_text("new extra")
+    state = VenvState.load(config_path)
+    assert (
+        state.needs_sync(venv_config.sync_paths(venv_config.requirements_out)) is True
+    )

@@ -23,7 +23,7 @@ def test_info(venv_config: VenvConfig):
         assert info.discovered_requirements.in_path == venv_config.requirements_in
         assert info.discovered_requirements.out_path == venv_config.requirements_out
         assert info.state.needs_sync is True
-        assert info.state.requirements_hash == ""
+        assert info.state.requirements_hash is None
         update_venv_state(venv_config, info.discovered_requirements.out_path)
         new_info = create_venv_info(venv_config)
         assert new_info.state.needs_sync is False

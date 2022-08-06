@@ -68,12 +68,12 @@ class VenvStateInfo(BaseModel):
 
     @classmethod
     def from_venv_state(
-        cls, state: VenvState, requirements_path: Path
+        cls, state: VenvState, requirements_path: Path, sync_paths: Sequence[Path]
     ) -> "VenvStateInfo":
         return cls(
             last_synced=state.last_synced,
-            requirements_hash=state.requirements_hash,
-            needs_sync=state.needs_sync(requirements_path),
+            requirements_hash=state.hash_for(requirements_path),
+            needs_sync=state.needs_sync(sync_paths),
         )
 
     @classmethod
@@ -87,7 +87,9 @@ class VenvStateInfo(BaseModel):
             )
         state = VenvState.load(venv_config.path / "mvenv-state.json")
         requirements_path = find_requirements_file(venv_config)
-        return cls.from_venv_state(state, requirements_path)
+        return cls.from_venv_state(
+            state, requirements_path, venv_config.sync_paths(requirements_path)
+        )
 
 
 class TargetInfo(BaseModel):
