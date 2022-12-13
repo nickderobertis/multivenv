@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -47,7 +47,7 @@
   
   
   
-    <title>multivenv package &#8212; multivenv 1.0.0a38 documentation</title>
+    <title>multivenv package &#8212; multivenv 1.0.0a39 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
@@ -61,6 +61,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
     <link rel="canonical" href="https://nickderobertis.github.io/multivenv/api/multivenv.html" />
@@ -90,7 +91,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="../index.html" title="multivenv 1.0.0a38 documentation"
+        <a href="../index.html" title="multivenv 1.0.0a39 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe869</i>
@@ -176,7 +177,7 @@
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
-          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">multivenv 1.0.0a38 documentation</a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">multivenv 1.0.0a39 documentation</a></li>
           <li class="md-tabs__item"><a href="modules.html" class="md-tabs__link">multivenv</a></li>
       </ul>
     </div>
@@ -189,13 +190,13 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="../index.html" title="multivenv 1.0.0a38 documentation" class="md-nav__button md-logo">
+    <a href="../index.html" title="multivenv 1.0.0a39 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe869</i>
       
     </a>
     <a href="../index.html"
-       title="multivenv 1.0.0a38 documentation">multivenv</a>
+       title="multivenv 1.0.0a39 documentation">multivenv</a>
   </label>
     <div class="md-nav__source">
       <a href="https://github.com/nickderobertis/multivenv" title="Go to repository" class="md-source" data-md-source="github">
@@ -251,7 +252,33 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#submodules" class="md-nav__link">Submodules</a>
         </li>
-        <li class="md-nav__item"><a href="#module-multivenv.exc" class="md-nav__link">multivenv.exc module</a>
+        <li class="md-nav__item"><a href="#module-multivenv.exc" class="md-nav__link">multivenv.exc module</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#multivenv.exc.CommandExitException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CommandExitException</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#multivenv.exc.CommandExitException.__init__" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CommandExitException.__init__()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.CompiledRequirementsNotFoundException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CompiledRequirementsNotFoundException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.MultivenvCommandException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultivenvCommandException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.MultivenvConfigException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultivenvConfigException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.MultivenvException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultivenvException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.MutlivenvConfigVenvsNotDefinedException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MutlivenvConfigVenvsNotDefinedException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.NoSuchPlatformStringException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">NoSuchPlatformStringException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.NoSuchVenvException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">NoSuchVenvException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.RequirementsFileException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">RequirementsFileException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.VenvNotSyncedException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">VenvNotSyncedException</span></code></a>
+        </li></ul>
+            </nav>
         </li></ul>
             </nav>
         </li>
@@ -297,7 +324,33 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#submodules" class="md-nav__link">Submodules</a>
         </li>
-        <li class="md-nav__item"><a href="#module-multivenv.exc" class="md-nav__link">multivenv.exc module</a>
+        <li class="md-nav__item"><a href="#module-multivenv.exc" class="md-nav__link">multivenv.exc module</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#multivenv.exc.CommandExitException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CommandExitException</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#multivenv.exc.CommandExitException.__init__" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CommandExitException.__init__()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.CompiledRequirementsNotFoundException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CompiledRequirementsNotFoundException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.MultivenvCommandException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultivenvCommandException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.MultivenvConfigException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultivenvConfigException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.MultivenvException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultivenvException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.MutlivenvConfigVenvsNotDefinedException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MutlivenvConfigVenvsNotDefinedException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.NoSuchPlatformStringException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">NoSuchPlatformStringException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.NoSuchVenvException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">NoSuchVenvException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.RequirementsFileException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">RequirementsFileException</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#multivenv.exc.VenvNotSyncedException" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">VenvNotSyncedException</span></code></a>
+        </li></ul>
+            </nav>
         </li></ul>
             </nav>
         </li>
@@ -350,7 +403,7 @@
 <dl class="py exception">
 <dt class="sig sig-object py" id="multivenv.exc.MultivenvException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">multivenv.exc.</span></span><span class="sig-name descname"><span class="pre">MultivenvException</span></span><a class="reference internal" href="../_modules/multivenv/exc.html#MultivenvException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#multivenv.exc.MultivenvException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 </dd></dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="multivenv.exc.MutlivenvConfigVenvsNotDefinedException">
@@ -416,7 +469,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>
