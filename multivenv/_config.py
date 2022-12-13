@@ -257,6 +257,7 @@ class TargetConfig(BaseModel):
             os_name=default_env["os_name"],
             platform_system=default_env["platform_system"],
             platform_machine=default_env["platform_machine"],
+            os_release=default_env["platform_release"],
         )
         return cls(version=version, platform=platform)
 
