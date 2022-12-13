@@ -8,7 +8,7 @@ from tests.osutils import is_not_found_output
 
 
 def test_run_in_venv(synced_venv: VenvConfig):
-    assert "appdirs==1.4.4" in run_in_venv(synced_venv, "pip freeze")
+    assert "multivenv-test-package==1.1.0" in run_in_venv(synced_venv, "pip freeze")
 
 
 def test_run_in_venv_with_emoji_output(synced_venv: VenvConfig):
@@ -28,4 +28,4 @@ def test_run_with_error(synced_venv: VenvConfig):
 
 def test_run_binary_not_in_venv(synced_venv: VenvConfig):
     result = run_in_venv(synced_venv, "bash -c 'pip freeze'")
-    assert "appdirs==1.4.4" in result
+    assert "multivenv-test-package==1.1.0" in result

@@ -11,7 +11,7 @@ def test_compile(venv_config: VenvConfig):
     compile_venv_requirements(venv_config)
     assert venv_config.requirements_out.exists()
     text = venv_config.requirements_out.read_text()
-    assert "appdirs==1.4.4" in text
+    assert "multivenv-test-package==1.1.0" in text
     assert "mvenv compile" in text
 
 
@@ -54,7 +54,12 @@ def test_compile_multiple_versions_and_platforms(multiplatform_venv_config: Venv
     for target in targets:
         assert venv_config.default_requirements_out_path_for(target).exists()
         text = venv_config.default_requirements_out_path_for(target).read_text()
-        assert "appdirs==1.4.4" in text
+        assert "multivenv-test-package==1.1.0" in text
+        # Check that on Windows it includes a dependency that can only be installed on Windows
+        if target.platform.os_name == "nt":
+            assert "pywin32" in text
+        else:
+            assert "pywin32" not in text
         assert "mvenv compile" in text
 
 
@@ -62,7 +67,7 @@ def test_compile_upgrade(needs_upgrade_compiled_venv_config: VenvConfig):
     venv_config = needs_upgrade_compiled_venv_config
     compile_venv_requirements(venv_config)
     text = venv_config.requirements_out.read_text()
-    assert "appdirs==1.4.4" in text
+    assert "multivenv-test-package==1.1.0" in text
     assert "mvenv compile" in text
 
 
@@ -71,5 +76,5 @@ def test_compile_prevent_upgrade(needs_upgrade_compiled_venv_config: VenvConfig)
     venv_config.upgrade = False
     compile_venv_requirements(venv_config)
     text = venv_config.requirements_out.read_text()
-    assert "appdirs==1.4.3" in text
+    assert "multivenv-test-package==1.0.0" in text
     assert "mvenv compile" in text

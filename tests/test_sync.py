@@ -22,7 +22,7 @@ def test_sync(compiled_venv_config: VenvConfig):
     sync_venv(venv_config)
     assert venv_config.path.exists()
     packages = get_installed_packages_in_venv(venv_config)
-    assert "appdirs==1.4.4" in packages
+    assert "multivenv-test-package==1.1.0" in packages
 
 
 def test_sync_specific_platform(
@@ -34,7 +34,7 @@ def test_sync_specific_platform(
     sync_venv(venv_config)
     assert venv_config.path.exists()
     packages = get_installed_packages_in_venv(venv_config)
-    assert "appdirs==1.4.4" in packages
+    assert "multivenv-test-package==1.1.0" in packages
 
 
 def test_sync_on_wrong_platform_without_fallback(
@@ -60,7 +60,7 @@ def test_sync_on_wrong_platform_with_version_fallback(
     sync_venv(venv_config)
     assert venv_config.path.exists()
     packages = get_installed_packages_in_venv(venv_config)
-    assert "appdirs==1.4.4" in packages
+    assert "multivenv-test-package==1.1.0" in packages
 
 
 def test_post_create(compiled_venv_config: VenvConfig):
@@ -76,7 +76,7 @@ def test_post_create(compiled_venv_config: VenvConfig):
     assert venv_config.path.exists()
     assert expect_path.exists()
     packages = get_installed_packages_in_venv(venv_config)
-    assert "appdirs==1.4.4" in packages
+    assert "multivenv-test-package==1.1.0" in packages
 
 
 def test_post_sync(compiled_venv_config: VenvConfig):
@@ -87,5 +87,5 @@ def test_post_sync(compiled_venv_config: VenvConfig):
     sync_venv(venv_config)
     assert venv_config.path.exists()
     packages = get_installed_packages_in_venv(venv_config)
-    assert "appdirs==1.4.4" in packages
+    assert "multivenv-test-package==1.1.0" in packages
     assert "flake8==5.0.3" in packages
