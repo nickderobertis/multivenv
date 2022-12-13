@@ -3,7 +3,7 @@ from typing import Iterator, List, Literal, Optional, TypeVar, Union
 
 from packaging import version as packaging_version
 from packaging.version import Version as PackagingVersion
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator, validator
 
 from multivenv import _ext_packaging
 from multivenv._dirutils import create_temp_path
@@ -17,6 +17,35 @@ class PlatformUserConfig(BaseModel):
     os_name: str
     platform_system: str
     platform_machine: str = "x86_64"
+    os_release: Optional[str] = None
+
+    @root_validator
+    def validate_os_release(cls, values):
+        # Validate that os_release is a valid version string if os_name is not windows
+        if values["os_name"] == "nt":
+            return values
+
+        if values.get("os_name", "").lower() == "darwin":
+            os_name = "MacOS"
+            example_version = "13.0"
+        else:
+            os_name = "Linux"
+            example_version = "5.15.0-56-generic"
+
+        if not values["os_release"]:
+            raise ValueError(
+                f"Must specify os_release for {os_name} platform, such as {example_version}"
+            )
+
+        if (
+            values.get("os_name", "").lower() == "darwin"
+            and not packaging_version.parse(values["os_release"]).is_prerelease
+        ):
+            raise ValueError(
+                f"Must specify os_release for {os_name} platform as a major.minor, such as {example_version}"
+            )
+
+        return values
 
 
 UserPlatformConfig = Union[PlatformUserConfig, PlatformString]
@@ -27,6 +56,7 @@ class PlatformConfig(BaseModel):
     os_name: str
     platform_system: str
     platform_machine: str
+    os_release: Optional[str] = None
 
     def __str__(self) -> str:
         return f"{self.sys_platform}-{self.platform_system}-{self.platform_machine}"
@@ -48,6 +78,7 @@ class PlatformConfig(BaseModel):
             user_config.sys_platform if user_config else default_env["sys_platform"]
         )
         os_name = user_config.os_name if user_config else default_env["os_name"]
+        os_release = user_config.os_release if user_config else None
         platform_machine = (
             user_config.platform_machine
             if user_config
@@ -61,6 +92,7 @@ class PlatformConfig(BaseModel):
         return cls(
             sys_platform=sys_platform,
             os_name=os_name,
+            os_release=os_release,
             platform_system=platform_system,
             platform_machine=platform_machine,
         )
@@ -72,12 +104,14 @@ class PlatformConfig(BaseModel):
                 sys_platform="linux",
                 os_name="posix",
                 platform_system="Linux",
+                os_release="5.15.0-56-generic",
             )
         elif platform == "macos":
             user_config = PlatformUserConfig(
                 sys_platform="darwin",
                 os_name="posix",
                 platform_system="Darwin",
+                os_release="12.0",
             )
         elif platform == "windows":
             user_config = PlatformUserConfig(

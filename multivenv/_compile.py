@@ -8,7 +8,7 @@ from piptools.scripts.compile import cli as compile_click_command
 
 from multivenv._config import TargetConfig, VenvConfig
 from multivenv._env import with_pip_tools_custom_compile_command_as_mvenv_compile
-from multivenv._ext_pip import monkey_patch_pip_packaging_markers_to_target
+from multivenv._ext_pip import monkey_patch_pip_to_target
 
 
 def compile_venv_requirements(config: VenvConfig):
@@ -38,7 +38,7 @@ def pip_tools_compile(
 
     # Determine whether to patch for target
     if target is not None:
-        target_context_manager = monkey_patch_pip_packaging_markers_to_target(target)
+        target_context_manager = monkey_patch_pip_to_target(target)
     else:
         target_context_manager = nullcontext()  # type: ignore
 
@@ -52,4 +52,5 @@ def pip_tools_compile(
             generate_hashes=True,
             rebuild=True,
             upgrade=upgrade,
+            verbose=True,
         )
