@@ -52,5 +52,4 @@ def pip_tools_compile(
             generate_hashes=True,
             rebuild=True,
             upgrade=upgrade,
-            verbose=True,
         )
