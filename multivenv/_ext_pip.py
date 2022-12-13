@@ -34,7 +34,7 @@ def monkey_patch_pip_to_target(
             _monkey_patch_cpython_tags,
             _monkey_patch_compatible_tags,
         ]:
-            stack.enter_context(fn(target))
+            stack.enter_context(fn(target))  # type: ignore
         yield
 
 
@@ -101,10 +101,11 @@ def _monkey_patch_cpython_tags(target: TargetConfig) -> Generator[None, None, No
     # Patch where it has been imported
     pip._internal.utils.compatibility_tags.cpython_tags = cpython_tags
 
-    yield
-
-    pip._vendor.packaging.tags.cpython_tags = orig_cpython_tags
-    pip._internal.utils.compatibility_tags.cpython_tags = orig_cpython_tags
+    try:
+        yield
+    finally:
+        pip._vendor.packaging.tags.cpython_tags = orig_cpython_tags
+        pip._internal.utils.compatibility_tags.cpython_tags = orig_cpython_tags
 
 
 @contextlib.contextmanager
@@ -165,14 +166,15 @@ def _monkey_patch_compatible_tags(
         )
 
     # Patch in the original module
-    pip._vendor.packaging.tags.compatible_tags = compatible_tags
+    pip._vendor.packaging.tags.compatible_tags = compatible_tags  # type: ignore
     # Patch where it has been imported
-    pip._internal.utils.compatibility_tags.compatible_tags = compatible_tags
+    pip._internal.utils.compatibility_tags.compatible_tags = compatible_tags  # type: ignore
 
-    yield
-
-    pip._vendor.packaging.tags.compatible_tags = orig_compatible_tags
-    pip._internal.utils.compatibility_tags.compatible_tags = orig_compatible_tags
+    try:
+        yield
+    finally:
+        pip._vendor.packaging.tags.compatible_tags = orig_compatible_tags  # type: ignore
+        pip._internal.utils.compatibility_tags.compatible_tags = orig_compatible_tags  # type: ignore
 
 
 @contextlib.contextmanager
@@ -218,9 +220,10 @@ def _monkey_patch_marker_evaluate(
 
     pip._vendor.packaging.markers.Marker.evaluate = evaluate  # type: ignore
 
-    yield
-
-    pip._vendor.packaging.markers.Marker.evaluate = orig_evaluate  # type: ignore
+    try:
+        yield
+    finally:
+        pip._vendor.packaging.markers.Marker.evaluate = orig_evaluate  # type: ignore
 
 
 @contextlib.contextmanager
@@ -304,9 +307,10 @@ def _monkey_patch_sysconfig_get_platform(
 
     sysconfig.get_platform = get_platform  # type: ignore
 
-    yield
-
-    sysconfig.get_platform = orig_platform  # type: ignore
+    try:
+        yield
+    finally:
+        sysconfig.get_platform = orig_platform  # type: ignore
 
 
 def _platform_tags(target: TargetConfig) -> List[str]:
