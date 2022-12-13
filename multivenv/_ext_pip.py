@@ -80,13 +80,13 @@ def _monkey_patch_cpython_tags(target: TargetConfig) -> Generator[None, None, No
         their normal position and not at the beginning.
         """
         # Provide defaults based on target, rather than current system
-        if python_version is None:
+        if python_version is None and target.version is not None:
             python_version = (
                 target.version.version.major,
                 target.version.version.minor,
             )
-        if not platforms:
-            platforms = _platform_tags(target)
+        if not platforms and target.platform is not None:
+            platforms = _platform_tags(target.platform)
 
         # Call the original function with the updated python version and platforms
         return orig_cpython_tags(
@@ -150,13 +150,13 @@ def _monkey_patch_compatible_tags(
         their normal position and not at the beginning.
         """
         # Provide defaults based on target, rather than current system
-        if python_version is None:
+        if python_version is None and target.version is not None:
             python_version = (
                 target.version.version.major,
                 target.version.version.minor,
             )
-        if not platforms:
-            platforms = _platform_tags(target)
+        if not platforms and target.platform is not None:
+            platforms = _platform_tags(target.platform)
 
         # Call the original function with the updated python version and platforms
         return orig_compatible_tags(
@@ -228,7 +228,7 @@ def _monkey_patch_marker_evaluate(
 
 @contextlib.contextmanager
 def _monkey_patch_sysconfig_get_platform(
-    target: TargetConfig,
+    target_platform: PlatformConfig,
 ) -> Generator[None, None, None]:
     """
     Monkey patch ``sysconfig.get_platform`` to use the given platform.
@@ -262,8 +262,8 @@ def _monkey_patch_sysconfig_get_platform(
 
         For other non-POSIX platforms, currently just returns 'sys.platform'.
         """
-        os_name = target.platform.os_name
-        machine = target.platform.platform_machine
+        os_name = target_platform.os_name
+        machine = target_platform.platform_machine
         platform_machine_lower = machine.lower()
 
         if os_name == "nt":
@@ -273,25 +273,25 @@ def _monkey_patch_sysconfig_get_platform(
                 return "win-arm32"
             if "(arm64)" in platform_machine_lower:
                 return "win-arm64"
-            return target.platform.sys_platform
+            return target_platform.sys_platform
 
         # As the target is mac, os_release must be defined
-        os_release = cast(str, target.platform.os_release)
+        os_release = cast(str, target_platform.os_release)
 
         # TODO: removed check for hasattr(os, 'uname') as not sure how to handle
         if os_name != "posix":
             # XXX what about the architecture? NT is Intel or Alpha
-            return target.platform.sys_platform
+            return target_platform.sys_platform
 
         # TODO: Removed check for _PYTHON_HOST_PLATFORM, is this a problem?
 
-        if target.platform.sys_platform.lower()[:5] == "linux":
+        if target_platform.sys_platform.lower()[:5] == "linux":
             # At least on Linux/Intel, 'machine' is the processor --
             # i386, etc.
             # XXX what about Alpha, SPARC, etc?
-            return f"{target.platform.sys_platform}-{machine}"
+            return f"{target_platform.sys_platform}-{machine}"
         # TODO: Handle sunos, aix, cygwin properly (see what was removed from original sysconfig.get_platform)
-        elif target.platform.sys_platform.lower()[:6] == "darwin":
+        elif target_platform.sys_platform.lower()[:6] == "darwin":
             import _osx_support
 
             os_name, os_release, machine = _osx_support.get_platform_osx(
@@ -313,17 +313,17 @@ def _monkey_patch_sysconfig_get_platform(
         sysconfig.get_platform = orig_platform  # type: ignore
 
 
-def _platform_tags(target: TargetConfig) -> List[str]:
+def _platform_tags(target_platform: PlatformConfig) -> List[str]:
     """
     Modified version of pip._vendor.packaging.tags.platform_tags that uses the given target
     rather than the current system.
     """
     from packaging.tags import _generic_platforms, _linux_platforms, mac_platforms
 
-    with _monkey_patch_sysconfig_get_platform(target):
-        if target.platform.platform_system == "Darwin":
+    with _monkey_patch_sysconfig_get_platform(target_platform):
+        if target_platform.platform_system == "Darwin":
             # As the target is mac, os_release must be defined
-            os_release = cast(str, target.platform.os_release)
+            os_release = cast(str, target_platform.os_release)
             release_tup = tuple(int(i) for i in os_release.split(".")[0:2])
             if len(release_tup) != 2:
                 raise ValueError(
@@ -331,8 +331,8 @@ def _platform_tags(target: TargetConfig) -> List[str]:
                 )
             # Now must have two elements
             release_tup = cast(Tuple[int, int], release_tup)
-            platforms_gen = mac_platforms(release_tup, target.platform.platform_machine)
-        elif target.platform.platform_system == "Linux":
+            platforms_gen = mac_platforms(release_tup, target_platform.platform_machine)
+        elif target_platform.platform_system == "Linux":
             platforms_gen = _linux_platforms()
         else:
             platforms_gen = _generic_platforms()

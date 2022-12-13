@@ -4,7 +4,7 @@ from typing import Iterator, List, Literal, Optional, TypeVar, Union
 
 from packaging import version as packaging_version
 from packaging.version import Version as PackagingVersion
-from pydantic import BaseModel, root_validator, validator
+from pydantic import BaseModel, root_validator
 
 from multivenv import _ext_packaging
 from multivenv._dirutils import create_temp_path
