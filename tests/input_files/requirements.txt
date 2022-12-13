@@ -4,5 +4,5 @@
 #
 #    mvenv compile
 #
-appdirs==1.4.4
+multivenv-test-package==1.1.0
     # via -r tests/input_files/requirements.in

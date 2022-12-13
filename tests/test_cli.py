@@ -55,7 +55,7 @@ def test_compile_cli(temp_dir: Path):
         assert not expect_out_path.exists()
         run_cli("compile")
         assert expect_out_path.exists()
-        assert "appdirs==1.4.4" in expect_out_path.read_text()
+        assert "multivenv-test-package==1.1.0" in expect_out_path.read_text()
 
 
 def test_compile_upgrade_cli(temp_dir: Path):
@@ -65,7 +65,7 @@ def test_compile_upgrade_cli(temp_dir: Path):
     shutil.copy(BASIC_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
         run_cli("compile")
-        assert "appdirs==1.4.4" in expect_out_path.read_text()
+        assert "multivenv-test-package==1.1.0" in expect_out_path.read_text()
 
 
 def test_compile_no_upgrade_cli(temp_dir: Path):
@@ -75,7 +75,7 @@ def test_compile_no_upgrade_cli(temp_dir: Path):
     shutil.copy(BASIC_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
         run_cli("compile --no-upgrade")
-        assert "appdirs==1.4.3" in expect_out_path.read_text()
+        assert "multivenv-test-package==1.0.0" in expect_out_path.read_text()
 
 
 def test_sync_cli(temp_dir: Path):
@@ -96,7 +96,7 @@ def test_sync_cli(temp_dir: Path):
             config_path=temp_dir / "mvenv.yaml",
         )
         run_cli("sync")
-        assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+        assert "multivenv-test-package==1.1.0" in get_installed_packages_in_venv(config)
 
 
 def test_sync_ephemeral(temp_dir: Path):
@@ -131,7 +131,7 @@ def test_post_create_and_sync(temp_dir: Path):
         # Check post_create hook
         assert expect_path.exists()
         packages = get_installed_packages_in_venv(config)
-        assert "appdirs==1.4.4" in packages
+        assert "multivenv-test-package==1.1.0" in packages
         # Check post_sync hook
         assert "flake8==5.0.3" in packages
 
@@ -156,7 +156,7 @@ def test_update_cli(temp_dir: Path):
         assert not expect_requirements_out_path.exists()
         run_cli("update")
         assert expect_requirements_out_path.exists()
-        assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+        assert "multivenv-test-package==1.1.0" in get_installed_packages_in_venv(config)
 
 
 def test_update_multiplatform_cli(temp_dir: Path, linux_310_environment):
@@ -189,7 +189,7 @@ def test_update_multiplatform_cli(temp_dir: Path, linux_310_environment):
         run_cli("update")
         for path in expect_requirements_out_paths:
             assert path.exists()
-        assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+        assert "multivenv-test-package==1.1.0" in get_installed_packages_in_venv(config)
 
 
 def test_update_ephemeral(temp_dir: Path):
@@ -220,7 +220,7 @@ def test_update_cli_with_upgrade(temp_dir: Path):
             config_path=temp_dir / "mvenv.yaml",
         )
         run_cli("update")
-        assert "appdirs==1.4.4" in get_installed_packages_in_venv(config)
+        assert "multivenv-test-package==1.1.0" in get_installed_packages_in_venv(config)
 
 
 def test_update_cli_with_no_upgrade(temp_dir: Path):
@@ -241,7 +241,7 @@ def test_update_cli_with_no_upgrade(temp_dir: Path):
             config_path=temp_dir / "mvenv.yaml",
         )
         run_cli("update --no-upgrade")
-        assert "appdirs==1.4.3" in get_installed_packages_in_venv(config)
+        assert "multivenv-test-package==1.0.0" in get_installed_packages_in_venv(config)
 
 
 def test_run_cli(temp_dir: Path):
@@ -251,7 +251,7 @@ def test_run_cli(temp_dir: Path):
     with change_directory_to(temp_dir):
         run_cli("sync")
         output = run_cli("run basic pip freeze")
-        assert "appdirs==1.4.4" in output.stdout
+        assert "multivenv-test-package==1.1.0" in output.stdout
 
 
 def test_run_cli_auto_sync(temp_dir: Path):
@@ -260,7 +260,7 @@ def test_run_cli_auto_sync(temp_dir: Path):
     shutil.copy(BASIC_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
         output = run_cli("run basic pip freeze")
-        assert "appdirs==1.4.4" in output.stdout
+        assert "multivenv-test-package==1.1.0" in output.stdout
 
 
 def test_run_cli_no_auto_sync(temp_dir: Path):
@@ -278,7 +278,7 @@ def test_run_ephemeral(temp_dir: Path):
     shutil.copy(EPHEMERAL_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
         output = run_cli("run basic pip freeze")
-        assert "appdirs==1.4.4" in output.stdout
+        assert "multivenv-test-package==1.1.0" in output.stdout
 
 
 def test_run_cli_error_propagate(temp_dir: Path):
@@ -327,7 +327,7 @@ def test_run_all_cli(temp_dir: Path):
     with change_directory_to(temp_dir):
         run_cli("sync")
         output = run_cli("run-all pip freeze")
-        assert "appdirs==1.4.4" in output.stdout
+        assert "multivenv-test-package==1.1.0" in output.stdout
 
 
 def test_run_all_ephemeral(temp_dir: Path):
@@ -336,7 +336,7 @@ def test_run_all_ephemeral(temp_dir: Path):
     shutil.copy(EPHEMERAL_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
         output = run_cli("run-all pip freeze")
-        assert "appdirs==1.4.4" in output.stdout
+        assert "multivenv-test-package==1.1.0" in output.stdout
 
 
 def test_info_no_venv(temp_dir: Path):
@@ -473,7 +473,7 @@ def test_manage_external_dependencies(temp_dir: Path):
     shutil.copy(AUTO_SYNC_CHANGED_CONFIG_PATH, temp_dir)
     with change_directory_to(temp_dir):
         output = run_cli("run basic pip freeze")
-        assert "appdirs==1.4.4" not in output.stdout
+        assert "multivenv-test-package==1.1.0" not in output.stdout
 
         # Now change the extra file to add the requirement
         shutil.copy(REQUIREMENTS_OUT_PATH, extra_path)
@@ -481,4 +481,4 @@ def test_manage_external_dependencies(temp_dir: Path):
         # Should auto-sync before running the command
         output2 = run_cli("run basic pip freeze")
         # Now the dependency is installed
-        assert "appdirs==1.4.4" in output2.stdout
+        assert "multivenv-test-package==1.1.0" in output2.stdout
