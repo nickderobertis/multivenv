@@ -1,3 +1,4 @@
+import platform
 from pathlib import Path
 from typing import Iterator, List, Literal, Optional, TypeVar, Union
 
@@ -252,14 +253,16 @@ class TargetConfig(BaseModel):
             ],
             implementation_name=default_env["implementation_name"],
         )
-        platform = PlatformConfig(
+        system_platform = PlatformConfig(
             sys_platform=default_env["sys_platform"],
             os_name=default_env["os_name"],
             platform_system=default_env["platform_system"],
             platform_machine=default_env["platform_machine"],
-            os_release=default_env["platform_release"],
+            # Default environment "platform_release" doesn't seem available on all
+            # systems, fall back to platform.release() if not available.
+            os_release=default_env.get("platform_release", platform.release()),
         )
-        return cls(version=version, platform=platform)
+        return cls(version=version, platform=system_platform)
 
     def without_version(self) -> "TargetConfig":
         return self.copy(update=dict(version=None))
